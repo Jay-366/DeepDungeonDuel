@@ -9,19 +9,23 @@ function ConnectWalletButton() {
 
   const connectWallet = async () => {
     try {
-      const { solana } = window as any;
-      
-      if (solana && solana.isPhantom) {
-        const response = await solana.connect();
-        setWalletAddress(response.publicKey.toString());
-        setIsConnected(true);
-        // Redirect to main game page
-        window.location.href = '/game';
-      } else {
-        alert('Phantom wallet is not installed! Please install it from https://phantom.app/');
+      // Check if window.phantom exists
+      if ('phantom' in window) {
+        const provider = (window as any).phantom?.solana;
+        
+        if (provider?.isPhantom) {
+          const response = await provider.connect();
+          setWalletAddress(response.publicKey.toString());
+          setIsConnected(true);
+          // Redirect to main game page
+          window.location.href = '/game';
+        } else {
+          alert('Phantom wallet is not installed! Please install it from https://phantom.app/');
+        }
       }
     } catch (error) {
       console.error('Error connecting to wallet:', error);
+      alert('Failed to connect to Phantom wallet. Please try again.');
     }
   };
 
