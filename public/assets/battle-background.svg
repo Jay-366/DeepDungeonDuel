@@ -1,0 +1,74 @@
+<svg width="800" height="400" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky -->
+  <rect width="800" height="300" fill="#1E293B" />
+  
+  <!-- Stars -->
+  <circle cx="50" cy="50" r="1" fill="white" />
+  <circle cx="120" cy="30" r="1" fill="white" />
+  <circle cx="200" cy="70" r="1" fill="white" />
+  <circle cx="280" cy="40" r="1" fill="white" />
+  <circle cx="350" cy="80" r="1" fill="white" />
+  <circle cx="400" cy="30" r="1" fill="white" />
+  <circle cx="450" cy="60" r="1" fill="white" />
+  <circle cx="520" cy="20" r="1" fill="white" />
+  <circle cx="580" cy="70" r="1" fill="white" />
+  <circle cx="650" cy="40" r="1" fill="white" />
+  <circle cx="720" cy="60" r="1" fill="white" />
+  <circle cx="760" cy="80" r="1" fill="white" />
+  
+  <circle cx="70" cy="100" r="1" fill="white" />
+  <circle cx="150" cy="120" r="1" fill="white" />
+  <circle cx="220" cy="140" r="1" fill="white" />
+  <circle cx="300" cy="110" r="1" fill="white" />
+  <circle cx="380" cy="130" r="1" fill="white" />
+  <circle cx="420" cy="100" r="1" fill="white" />
+  <circle cx="480" cy="120" r="1" fill="white" />
+  <circle cx="550" cy="90" r="1" fill="white" />
+  <circle cx="610" cy="110" r="1" fill="white" />
+  <circle cx="670" cy="150" r="1" fill="white" />
+  <circle cx="730" cy="120" r="1" fill="white" />
+  <circle cx="780" cy="140" r="1" fill="white" />
+  
+  <!-- Distant Mountains -->
+  <path d="M0 300L100 230L200 280L300 200L400 270L500 220L600 250L700 190L800 240V300H0Z" fill="#334155" />
+  
+  <!-- Closer Mountains -->
+  <path d="M0 300L150 250L250 290L400 230L550 280L650 260L800 300H0Z" fill="#475569" />
+  
+  <!-- Ground -->
+  <rect y="300" width="800" height="100" fill="#64748B" />
+  
+  <!-- Platform Left -->
+  <rect x="50" y="280" width="200" height="20" fill="#7C3AED" />
+  <rect x="70" y="280" width="160" height="5" fill="#8B5CF6" />
+  
+  <!-- Platform Right -->
+  <rect x="550" y="280" width="200" height="20" fill="#7C3AED" />
+  <rect x="570" y="280" width="160" height="5" fill="#8B5CF6" />
+  
+  <!-- Floor Grid Lines -->
+  <line x1="0" y1="320" x2="800" y2="320" stroke="#475569" stroke-width="1" />
+  <line x1="0" y1="340" x2="800" y2="340" stroke="#475569" stroke-width="1" />
+  <line x1="0" y1="360" x2="800" y2="360" stroke="#475569" stroke-width="1" />
+  <line x1="0" y1="380" x2="800" y2="380" stroke="#475569" stroke-width="1" />
+  
+  <line x1="50" y1="300" x2="50" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="100" y1="300" x2="100" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="150" y1="300" x2="150" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="200" y1="300" x2="200" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="250" y1="300" x2="250" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="300" y1="300" x2="300" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="350" y1="300" x2="350" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="400" y1="300" x2="400" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="450" y1="300" x2="450" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="500" y1="300" x2="500" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="550" y1="300" x2="550" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="600" y1="300" x2="600" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="650" y1="300" x2="650" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="700" y1="300" x2="700" y2="400" stroke="#475569" stroke-width="1" />
+  <line x1="750" y1="300" x2="750" y2="400" stroke="#475569" stroke-width="1" />
+  
+  <!-- Decorative Elements -->
+  <circle cx="150" cy="260" r="5" fill="#A855F7" />
+  <circle cx="650" cy="260" r="5" fill="#A855F7" />
+</svg> 

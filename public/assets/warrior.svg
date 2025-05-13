@@ -1,0 +1,39 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Warrior Character -->
+  <!-- Head/Helmet -->
+  <circle cx="100" cy="70" r="30" fill="#64748B" />
+  <path d="M70 70C70 60 80 40 100 40C120 40 130 60 130 70" fill="#475569" />
+  <path d="M70 70C70 65 80 50 100 50C120 50 130 65 130 70" fill="#64748B" />
+  <path d="M85 65L80 75M115 65L120 75" stroke="#A855F7" stroke-width="2" />
+  <circle cx="92" cy="65" r="4" fill="white" />
+  <circle cx="92" cy="65" r="2" fill="#1E293B" />
+  <circle cx="108" cy="65" r="4" fill="white" />
+  <circle cx="108" cy="65" r="2" fill="#1E293B" />
+  
+  <!-- Body/Armor -->
+  <path d="M75 100V130C75 135 85 150 100 150C115 150 125 135 125 130V100" fill="#64748B" />
+  <rect x="75" y="90" width="50" height="15" rx="5" fill="#475569" />
+  <path d="M85 105L85 125M100 105L100 125M115 105L115 125" stroke="#A855F7" stroke-width="3" />
+  <rect x="90" y="130" width="20" height="10" fill="#475569" />
+  
+  <!-- Cape -->
+  <path d="M75 95C55 100 50 140 50 160C70 150 85 150 100 155C115 150 130 150 150 160C150 140 145 100 125 95" fill="#A855F7" />
+  
+  <!-- Arms -->
+  <rect x="70" y="95" width="10" height="35" rx="5" fill="#64748B" />
+  <rect x="120" y="95" width="10" height="35" rx="5" fill="#64748B" />
+  <circle cx="75" cy="135" r="7" fill="#64748B" />
+  <circle cx="125" cy="135" r="7" fill="#64748B" />
+  
+  <!-- Weapon -->
+  <rect x="50" y="110" width="10" height="60" rx="2" fill="#92400E" />
+  <path d="M30 100L80 100L70 110L40 110L30 100Z" fill="#A855F7" />
+  <rect x="45" y="85" width="20" height="15" fill="#64748B" />
+  <path d="M45 85L35 75L75 75L65 85H45Z" fill="#64748B" />
+  
+  <!-- Legs -->
+  <rect x="90" y="150" width="10" height="30" rx="5" fill="#64748B" />
+  <rect x="100" y="150" width="10" height="30" rx="5" fill="#64748B" />
+  <rect x="90" y="180" width="10" height="5" rx="2" fill="#475569" />
+  <rect x="100" y="180" width="10" height="5" rx="2" fill="#475569" />
+</svg> 
