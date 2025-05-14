@@ -126,47 +126,6 @@ const Bet: React.FC<BetProps> = ({ userAgent, enemyAgent, walletAddress, balance
           Battle
         </button>
       </div>
-<<<<<<< HEAD
-=======
-
-      {/* Bet Amount Selection */}
-      <div className="w-full max-w-md mx-auto bg-gray-800 rounded-xl p-6 flex flex-col items-center mb-6">
-        <div className="flex items-center mb-4 w-full justify-between">
-          <span className="text-white font-bold text-lg">Bet Amount (SOL)</span>
-          <span className="text-gray-400 text-sm">Balance: {balance.includes('SOL') ? balance : `${balance} SOL`}</span>
-        </div>
-        <div className="flex gap-4 mb-4 w-full justify-center">
-          {presetAmounts.map((amt) => (
-            <button
-              key={amt}
-              className={`px-4 py-2 rounded-lg font-bold border-2 transition-all ${betAmount === amt.toString() ? 'bg-purple-600 border-purple-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-700'}`}
-              onClick={() => handleAmountClick(amt)}
-            >
-              {amt} SOL
-            </button>
-          ))}
-        </div>
-        <input
-          type="number"
-          min="0.01"
-          step="0.01"
-          placeholder="Enter custom amount"
-          className="w-full px-4 py-2 rounded-lg bg-gray-900 text-white border-2 border-gray-700 focus:border-purple-500 focus:outline-none text-center font-bold text-lg mb-2"
-          value={betAmount}
-          onChange={handleInputChange}
-        />
-        {error && <div className="text-red-400 text-sm mt-2">{error}</div>}
-      </div>
-
-      {/* Battle Button */}
-      <button
-        className={`w-full max-w-md mx-auto px-8 py-4 rounded-xl text-lg font-bold transition-colors ${selectedAgent && betAmount ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' : 'bg-gray-700 text-gray-400 cursor-not-allowed'}`}
-        disabled={!(selectedAgent && betAmount)}
-        onClick={handleBattle}
-      >
-        Battle
-      </button>
->>>>>>> 4e6fed7131f74b4a417e1ce20235b34c82611796
     </div>
   );
 };
