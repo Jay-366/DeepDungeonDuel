@@ -1,9 +1,10 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { PhantomWalletCard } from '../components/Phantom';
 import Bet from '../components/Bet';
 import { useRouter } from 'next/navigation';
+import { Connection } from "@solana/web3.js";
 
 // Mock agent data
 const userAgent = {
@@ -21,12 +22,58 @@ const enemyAgent = {
   odds: 2.1,
 };
 
-// Mock wallet info (replace with real context/hook in integration)
-const walletAddress = '7Gk3...9f2A';
-const balance = '1.23';
-
 export default function BetPage() {
   const router = useRouter();
+  const [walletAddress, setWalletAddress] = useState<string>('');
+  const [balance, setBalance] = useState<string>('0');
+
+  useEffect(() => {
+    // Check if wallet is connected and fetch balance
+    const checkWallet = async () => {
+      const { solana } = window as any;
+      if (solana && solana.isPhantom) {
+        try {
+          // Get wallet address
+          if (solana.isConnected && solana.publicKey) {
+            const publicKey = solana.publicKey.toString();
+            setWalletAddress(publicKey);
+            
+            // Fetch real SOL balance from devnet
+            try {
+              const connection = new Connection("https://api.devnet.solana.com");
+              const balanceInLamports = await connection.getBalance(solana.publicKey);
+              const solBalance = (balanceInLamports / 1000000000).toFixed(3);
+              setBalance(solBalance);
+            } catch (balanceError) {
+              console.error("Error fetching SOL balance:", balanceError);
+              setBalance("0");
+            }
+          } else {
+            const resp = await solana.connect();
+            setWalletAddress(resp.publicKey.toString());
+            
+            // Fetch real SOL balance from devnet
+            try {
+              const connection = new Connection("https://api.devnet.solana.com");
+              const balanceInLamports = await connection.getBalance(resp.publicKey);
+              const solBalance = (balanceInLamports / 1000000000).toFixed(3);
+              setBalance(solBalance);
+            } catch (balanceError) {
+              console.error("Error fetching SOL balance:", balanceError);
+              setBalance("0");
+            }
+          }
+        } catch (error) {
+          console.error('Error connecting to wallet:', error);
+          router.push('/');
+        }
+      } else {
+        router.push('/');
+      }
+    };
+    
+    checkWallet();
+  }, [router]);
 
   const handleBattle = (betAgentId: number, amount: number) => {
     // Here you would handle the bet logic, then redirect

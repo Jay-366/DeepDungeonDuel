@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Canvas } from '@react-three/fiber';
-import { PlayPhantomWalletCard } from '../components/Phantom';
+import { FaShieldAlt, FaUsers, FaTrophy } from 'react-icons/fa';
+import { Connection } from "@solana/web3.js";
 
 const Grog = dynamic(() => import('../../public/model/Grog_the_adventurer').then(mod => mod.Model), { ssr: false });
 const Batman = dynamic(() => import('../../public/model/Marvel_rivals_-_batman_beyond_fanart').then(mod => mod.Model), { ssr: false });
@@ -27,7 +28,7 @@ const CharacterCard = ({ name, role, level, rarity, selected, onClick, ModelComp
 }) => {
   return (
     <div
-      className={`relative bg-black/60 rounded-xl overflow-hidden transition-transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer border-4 ${selected ? 'border-purple-400' : 'border-transparent'}`}
+      className={`relative bg-gray-800 rounded-xl overflow-hidden transition-transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer border-4 ${selected ? 'border-purple-400' : 'border-transparent'}`}
       onClick={onClick}
     >
       <div className="absolute top-2 right-2 bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold">
@@ -40,8 +41,8 @@ const CharacterCard = ({ name, role, level, rarity, selected, onClick, ModelComp
             <ModelComponent {...modelProps} />
           </Canvas>
         </div>
-        <h3 className="text-xl font-bold text-white mb-1 fantasy-title">{name}</h3>
-        <p className="text-purple-300 mb-3 fantasy-title">{role}</p>
+        <h3 className="text-xl font-bold text-white mb-1">{name}</h3>
+        <p className="text-purple-300 mb-3">{role}</p>
         <div className="flex justify-between items-center">
           <div className="text-sm text-gray-400">
             Level <span className="text-white font-bold">{level}</span>
@@ -79,12 +80,25 @@ const gameModes = [
 function usePhantomWallet() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [balance, setBalance] = useState<string | null>(null);
+
+  const fetchBalance = async (publicKey: any) => {
+    try {
+      const connection = new Connection("https://api.devnet.solana.com");
+      const balanceInLamports = await connection.getBalance(publicKey);
+      const solBalance = (balanceInLamports / 1000000000).toFixed(3);
+      setBalance(`${solBalance} SOL`);
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      setBalance("Error");
+    }
+  };
 
   useEffect(() => {
-    // Check if already connected
     const { solana } = window as any;
     if (solana && solana.isPhantom && solana.isConnected && solana.publicKey) {
       setWalletAddress(solana.publicKey.toString());
+      fetchBalance(solana.publicKey);
     }
   }, []);
 
@@ -95,6 +109,7 @@ function usePhantomWallet() {
       if (solana && solana.isPhantom) {
         const resp = await solana.connect();
         setWalletAddress(resp.publicKey.toString());
+        fetchBalance(resp.publicKey);
       } else {
         alert('Phantom wallet not found. Please install Phantom.');
       }
@@ -105,14 +120,14 @@ function usePhantomWallet() {
     }
   };
 
-  return { walletAddress, connect, connecting };
+  return { walletAddress, connect, connecting, balance };
 }
 
 export default function Play() {
   const [selectedChampion, setSelectedChampion] = useState<number | null>(null);
   const [selectedGameMode, setSelectedGameMode] = useState<string | null>(null);
   const router = useRouter();
-  const { walletAddress, connect, connecting } = usePhantomWallet();
+  const { walletAddress, connect, connecting, balance } = usePhantomWallet();
 
   // Placeholder characters
   const characters = [
@@ -181,16 +196,18 @@ export default function Play() {
   }
 
   return (
-    <div style={{ background: "url('/assets/DungeonBackground.png') center center / cover no-repeat, linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(88,28,135,0.6))" }} className="min-h-screen bg-gradient-to-b from-black to-purple-900/30 pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-black to-purple-900/30 pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-6xl">
         {/* Back button */}
-        <button
-          onClick={() => window.location.href = '/'}
-          className="flex items-center gap-2 px-8 py-3 rounded-xl bg-purple-600 font-bold hover:bg-purple-700 transition mb-6 fantasy-title text-2xl text-purple-300 drop-shadow-lg hover:text-yellow-300"
+        <Link
+          href="/"
+          className="inline-flex items-center text-purple-300 hover:text-purple-100 mb-6"
         >
-          <Image src="/assets/chevron-left.png" alt="Back Arrow" width={28} height={28} />
+          <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
           Back to Home
-        </button>
+        </Link>
 
         {/* Header */}
         <div className="text-center mb-12">
@@ -201,7 +218,28 @@ export default function Play() {
         </div>
 
         {/* Wallet Connection */}
-        <PlayPhantomWalletCard walletAddress={walletAddress} winRate={72.5} amount={"1.23"} />
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 mb-12 max-w-xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-gray-400">Wallet:</span>
+                <span className="text-white font-mono">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+              </div>
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-gray-400">Win Rate:</span>
+                <span className="text-white font-bold">72.5%</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-gray-400">Amount:</span>
+                <span className="text-white font-bold">{balance || 'Loading...'}</span>
+              </div>
+            </div>
+            <div className="flex flex-col items-center justify-center">
+              <Image src="/Phantom-Icon_Transparent_Purple.png" alt="Phantom Icon" width={60} height={60} className="rounded-full border-4 border-purple-500 shadow-lg" />
+              <span className="text-xs text-gray-400 mt-2">Phantom Wallet</span>
+            </div>
+          </div>
+        </div>
 
         {/* Character Selection */}
         <div className="mb-12">
@@ -228,19 +266,19 @@ export default function Play() {
         {/* Play Modes */}
         <div>
           <h2 className="text-2xl font-bold text-white mb-6">Game Modes</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center items-center max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {gameModes.map((mode) => (
               <div
                 key={mode.id}
-                className={`bg-black/60 rounded-2xl p-8 w-full flex-1 transition-colors cursor-pointer border-4 flex flex-col items-center hover:bg-gray-800 shadow-xl backdrop-blur-sm ${selectedGameMode === mode.id ? 'border-purple-700/40 bg-purple-900/40' : 'border-transparent'}`}
+                className={`bg-gray-800/70 rounded-2xl p-8 transition-colors cursor-pointer border-4 flex flex-col items-center hover:bg-gray-800 shadow-lg ${selectedGameMode === mode.id ? 'border-purple-400 bg-purple-900/40' : 'border-transparent'}`}
                 onClick={() => setSelectedGameMode(selectedGameMode === mode.id ? null : mode.id)}
                 style={{ minHeight: 240 }}
               >
                 <div className="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center mb-5">
                   {mode.icon}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2 fantasy-title">{mode.name}</h3>
-                <p className="text-gray-400 mb-4 text-center fantasy-title">{mode.description}</p>
+                <h3 className="text-xl font-bold text-white mb-2">{mode.name}</h3>
+                <p className="text-gray-400 mb-4 text-center">{mode.description}</p>
               </div>
             ))}
           </div>
@@ -249,7 +287,7 @@ export default function Play() {
         {/* Start Play Button */}
         <div className="flex justify-center mt-12">
           <button
-            className={`px-10 py-4 rounded-xl text-lg font-bold transition-colors ${selectedChampion && selectedGameMode ? 'bg-purple-600 hover:bg-purple-700 cursor-pointer' : 'bg-gray-700 cursor-not-allowed'} fantasy-title text-2xl text-purple-300 drop-shadow-lg hover:text-yellow-300`}
+            className={`px-10 py-4 rounded-xl text-lg font-bold transition-colors ${selectedChampion && selectedGameMode ? 'bg-purple-600 text-white hover:bg-purple-700 cursor-pointer' : 'bg-gray-700 text-gray-400 cursor-not-allowed'}`}
             disabled={!(selectedChampion && selectedGameMode)}
             onClick={handleStartPlay}
           >

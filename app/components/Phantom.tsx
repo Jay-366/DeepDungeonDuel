@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Image from "next/image";
+import { Connection } from "@solana/web3.js";
 
 // Context type
 interface PhantomContextType {
@@ -71,8 +72,19 @@ export const ConnectPhantomButton = ({ onConnect }: { onConnect?: () => void }) 
       const resp = await solana.connect();
       setWalletAddress(resp.publicKey.toString());
       setShowCard(true);
-      // Fetch balance (optional, mock for now)
-      setBalance("1.23 SOL");
+      
+      // Fetch real balance from Phantom wallet
+      try {
+        const connection = new Connection("https://api.devnet.solana.com");
+        const balance = await connection.getBalance(resp.publicKey);
+        // Convert lamports to SOL (1 SOL = 10^9 lamports)
+        const solBalance = (balance / 1000000000).toFixed(3);
+        setBalance(`${solBalance} SOL`);
+      } catch (balanceError) {
+        console.error("Error fetching balance:", balanceError);
+        setBalance("Error fetching balance");
+      }
+      
       if (onConnect) onConnect();
     } catch (e) {
       // User rejected or error
@@ -100,41 +112,71 @@ export const ConnectPhantomButton = ({ onConnect }: { onConnect?: () => void }) 
 
 // Phantom Wallet Card
 export const PhantomWalletCard = ({ walletAddress, balance }: { walletAddress: string; balance: string | null }) => (
-  <div className="flex flex-col items-center w-full max-w-md mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-lg border-4 border-purple-700/40 space-y-4 animate-fade-in">
-    <h2 className="text-2xl font-bold text-white mb-1 text-center fantasy-title">Your Phantom Wallet</h2>
+  <div className="flex flex-col items-center w-full max-w-md mx-auto bg-gray-800/70 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-lg space-y-4 animate-fade-in">
+    <h2 className="text-xl font-bold text-white mb-1 text-center">Your Phantom Wallet</h2>
     <div className="flex flex-col items-center space-y-2 w-full">
       <div className="flex items-center space-x-2">
-        <span className="text-gray-400 fantasy-title">Wallet:</span>
-        <span className="text-white font-mono fantasy-title">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+        <span className="text-gray-400">Wallet:</span>
+        <span className="text-white font-mono">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
       </div>
       <div className="flex items-center space-x-2">
-        <span className="text-gray-400 fantasy-title">Balance:</span>
-        <span className="text-white font-bold fantasy-title">{balance || 'Loading...'}</span>
+        <span className="text-gray-400">Balance:</span>
+        <span className="text-white font-bold">{balance || 'Loading...'}</span>
       </div>
     </div>
   </div>
 );
 
-export const PlayPhantomWalletCard = ({ walletAddress, winRate, amount }: { walletAddress: string; winRate: number; amount: string }) => (
-  <div className="relative flex flex-col items-center w-full max-w-md mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-6 mb-12 shadow-lg border-4 border-purple-700/40 space-y-2 animate-fade-in text-center">
-    <button className="absolute top-3 right-3 p-2 bg-purple-400/90 rounded-full shadow-lg ring-2 ring-purple-600 hover:bg-purple-300 transition z-20" aria-label="Edit Wallet Info">
-      <Image src="/assets/edit.png" alt="Edit" width={25} height={25} />
-    </button>
-    <h2 className="text-2xl font-bold text-white mb-2 fantasy-title">Your Phantom Wallet</h2>
-    <div className="flex flex-col items-center space-y-2 w-full">
-      <div className="flex flex-col items-center">
-        <span className="text-gray-400 fantasy-title">Wallet:</span>
-        <span className="text-white font-mono fantasy-title">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+// Wallet Info component (mock win rate and amount)
+export const PhantomWalletInfo = () => {
+  const { walletAddress } = usePhantom();
+  const [balance, setBalance] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!walletAddress) return;
+      
+      try {
+        const { solana } = window as any;
+        if (solana && solana.isPhantom) {
+          const connection = new Connection("https://api.devnet.solana.com");
+          const publicKey = solana.publicKey;
+          const balanceInLamports = await connection.getBalance(publicKey);
+          const solBalance = (balanceInLamports / 1000000000).toFixed(3);
+          setBalance(`${solBalance} SOL`);
+        }
+      } catch (error) {
+        console.error("Error fetching balance:", error);
+        setBalance("Error");
+      }
+    };
+    
+    fetchBalance();
+  }, [walletAddress]);
+  
+  if (!walletAddress) return null;
+  return (
+    <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 mb-12 max-w-xl mx-auto">
+      <div>
+        <h2 className="text-xl font-bold text-white mb-1">Your Deep Dungeon Duel Account</h2>
+        <p className="text-gray-400 mb-2">Phantom wallet is your game account</p>
+        <div className="flex items-center space-x-2 mb-1">
+          <span className="text-gray-400">Wallet:</span>
+          <span className="text-white font-mono">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+        </div>
+        <div className="flex items-center space-x-2 mb-1">
+          <span className="text-gray-400">Win Rate:</span>
+          <span className="text-white font-bold">72.5%</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-gray-400">Amount:</span>
+          <span className="text-white font-bold">{balance || 'Loading...'}</span>
+        </div>
       </div>
-      <div className="flex flex-col items-center">
-        <span className="text-gray-400 fantasy-title">Win Rate:</span>
-        <span className="text-white font-bold fantasy-title">{winRate}%</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <span className="text-gray-400 fantasy-title">Amount:</span>
-        <span className="text-white font-bold fantasy-title">{amount} SOL</span>
+      <div className="flex flex-col items-center justify-center">
+        <Image src="/Phantom-Icon_Transparent_Purple.png" alt="Phantom Icon" width={60} height={60} className="rounded-full border-4 border-purple-500 shadow-lg" />
+        <span className="text-xs text-gray-400 mt-2">Phantom Wallet</span>
       </div>
     </div>
-  </div>
-);
-
+  );
+}; 

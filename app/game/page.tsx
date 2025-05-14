@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Connection } from "@solana/web3.js";
 
 export default function GamePage() {
   const [walletAddress, setWalletAddress] = useState('');
@@ -15,9 +16,20 @@ export default function GamePage() {
         try {
           const response = await solana.connect();
           setWalletAddress(response.publicKey.toString());
-          // Here you would typically fetch SOL and token balances
-          // setSolBalance(...);
-          // setTokenBalance(...);
+          
+          // Fetch real SOL balance
+          try {
+            const connection = new Connection("https://api.devnet.solana.com");
+            const balanceInLamports = await connection.getBalance(response.publicKey);
+            const balance = (balanceInLamports / 1000000000).toFixed(3);
+            setSolBalance(`${balance}`);
+          } catch (balanceError) {
+            console.error("Error fetching SOL balance:", balanceError);
+            setSolBalance("Error");
+          }
+          
+          // Token balance would be fetched separately
+          setTokenBalance("0"); // Placeholder
         } catch (error) {
           console.error('Error connecting to wallet:', error);
           window.location.href = '/';
