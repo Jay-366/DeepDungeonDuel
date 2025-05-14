@@ -31,12 +31,28 @@ export default class BattleScene extends Phaser.Scene {
     energy: 80,
     maxEnergy: 80
   };
+  
+  // Battle data from URL params
+  private betAmount: number = 0;
+  private odds: number = 1;
+  private playerName: string = 'Eldric';
+  private enemyName: string = 'Blue Witch';
+  private damageHistory: any[] = [];
 
   constructor() {
     super('BattleScene');
   }
 
   preload() {
+    // Get URL parameters
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      this.betAmount = Number(urlParams.get('bet')) || 0;
+      this.odds = Number(urlParams.get('odds')) || 1;
+      this.playerName = urlParams.get('player') || 'Eldric';
+      this.enemyName = urlParams.get('opponent') || 'Blue Witch';
+    }
+    
     // Load game assets
     this.load.image('bg-palace-hallway', '/background/vecteezy_royal-palace-hallway-with-stairs-at-night_24238333.jpg');
     this.load.image('bg-palace-corridor', '/background/vecteezy_ancient-palace-or-castle-corridor-interior_23878092.jpg');
@@ -193,6 +209,13 @@ export default class BattleScene extends Phaser.Scene {
     // Update enemy health
     this.enemyStats.health = Math.max(0, this.enemyStats.health - damage);
     
+    // Record for battle history
+    this.damageHistory.push({
+      agent: this.playerName,
+      action: 'Attack',
+      amount: damage
+    });
+    
     // Show attack animation and add to chat interface
     const message = `You dealt ${damage} damage!`;
     this.showMessage(message);
@@ -242,6 +265,13 @@ export default class BattleScene extends Phaser.Scene {
     this.playerStats.energy = Math.max(0, this.playerStats.energy - 20);
     this.enemyStats.health = Math.max(0, this.enemyStats.health - damage);
     
+    // Record for battle history
+    this.damageHistory.push({
+      agent: this.playerName,
+      action: 'Skill',
+      amount: Math.floor(damage)
+    });
+    
     // Show skill animation and add to chat interface
     const message = `You used Skill for ${Math.floor(damage)} damage!`;
     this.showMessage(message);
@@ -280,6 +310,13 @@ export default class BattleScene extends Phaser.Scene {
     // Restore some energy
     this.playerStats.energy = Math.min(this.playerStats.maxEnergy, this.playerStats.energy + 10);
     
+    // Record for battle history
+    this.damageHistory.push({
+      agent: this.playerName,
+      action: 'Defend',
+      amount: 0
+    });
+    
     // Show defend message and add to chat interface
     const message = 'You are defending!';
     this.showMessage(message);
@@ -307,6 +344,13 @@ export default class BattleScene extends Phaser.Scene {
       
       // Update player health
       this.playerStats.health = Math.max(0, this.playerStats.health - damage);
+      
+      // Record for battle history
+      this.damageHistory.push({
+        agent: this.enemyName,
+        action: 'Attack',
+        amount: damage
+      });
       
       // Show attack animation and add to chat interface
       const message = `Enemy dealt ${damage} damage!`;
@@ -380,17 +424,13 @@ export default class BattleScene extends Phaser.Scene {
     }).setOrigin(0.5);
     
     continueButton.on('pointerdown', () => {
-      // Navigate to result page with battle data
-      // TODO: Replace with real data from the battle
+      // Navigate to result page with real battle data
       const resultData = {
-        winner: 'Eldric', // Replace with actual winner
-        loser: 'Blue Witch', // Replace with actual loser
-        bet: 1.23, // Replace with actual bet
-        odds: 1.5, // Replace with actual odds
-        history: [
-          { agent: 'Eldric', action: 'Attack', amount: 20 },
-          { agent: 'Blue Witch', action: 'Spell', amount: 15 },
-        ], // Replace with actual damage history
+        winner: this.playerName,
+        loser: this.enemyName,
+        bet: this.betAmount,
+        odds: this.odds,
+        history: this.damageHistory,
       };
       if (typeof window !== 'undefined' && (window as any).goToBattleResult) {
         (window as any).goToBattleResult(resultData);

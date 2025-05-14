@@ -60,11 +60,11 @@ export default function ResultPage() {
           </div>
           <div>
             <div className="text-gray-400">Payout</div>
-            <div className="text-green-400 font-bold">{payout} SOL</div>
+            <div className="text-green-400 font-bold">{payout.toFixed(3)} SOL</div>
           </div>
         </div>
         <div className="text-center text-gray-400">
-          The loser pays <span className="text-red-400 font-bold">{payout} SOL</span> to the winner.
+          The loser pays <span className="text-red-400 font-bold">{payout.toFixed(3)} SOL</span> to the winner.
         </div>
         <button
           className="mt-8 px-8 py-3 rounded-xl bg-purple-600 text-white font-bold hover:bg-purple-700 transition"

@@ -76,8 +76,20 @@ export default function BetPage() {
   }, [router]);
 
   const handleBattle = (betAgentId: number, amount: number) => {
-    // Here you would handle the bet logic, then redirect
-    router.push('/play/battle');
+    // Get the selected agent and opposing agent
+    const selectedAgent = betAgentId === userAgent.id ? userAgent : enemyAgent;
+    const opposingAgent = betAgentId === userAgent.id ? enemyAgent : userAgent;
+    
+    // Create query params with real bet amount and odds
+    const queryParams = new URLSearchParams({
+      bet: amount.toString(),
+      odds: selectedAgent.odds.toString(),
+      player: selectedAgent.name,
+      opponent: opposingAgent.name
+    }).toString();
+    
+    // Navigate to battle page with parameters
+    router.push(`/play/battle?${queryParams}`);
   };
 
   return (
