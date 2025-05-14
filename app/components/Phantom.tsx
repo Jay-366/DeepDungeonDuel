@@ -116,7 +116,10 @@ export const PhantomWalletCard = ({ walletAddress, balance }: { walletAddress: s
 );
 
 export const PlayPhantomWalletCard = ({ walletAddress, winRate, amount }: { walletAddress: string; winRate: number; amount: string }) => (
-  <div className="flex flex-col items-center w-full max-w-md mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-6 mb-12 shadow-lg border-4 border-purple-700/40 space-y-2 animate-fade-in text-center">
+  <div className="relative flex flex-col items-center w-full max-w-md mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-6 mb-12 shadow-lg border-4 border-purple-700/40 space-y-2 animate-fade-in text-center">
+    <button className="absolute top-3 right-3 p-2 bg-purple-400/90 rounded-full shadow-lg ring-2 ring-purple-600 hover:bg-purple-300 transition z-20" aria-label="Edit Wallet Info">
+      <Image src="/assets/edit.png" alt="Edit" width={25} height={25} />
+    </button>
     <h2 className="text-2xl font-bold text-white mb-2 fantasy-title">Your Phantom Wallet</h2>
     <div className="flex flex-col items-center space-y-2 w-full">
       <div className="flex flex-col items-center">
