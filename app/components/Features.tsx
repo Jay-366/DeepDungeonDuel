@@ -14,24 +14,44 @@ const FeatureCard = ({ icon, title, description }: { icon: string, title: string
 const Features = () => {
   const features = [
     {
-      icon: "/assets/sword.svg",
-      title: "Epic Battles",
-      description: "Battle monsters and other players in thrilling turn-based combat with strategic depth.",
+      icon: "/Phantom-Icon_Transparent_Purple.png",
+      title: "Phantom Wallet Integration",
+      description: "Seamlessly connect your Phantom wallet to start playing. Your account is auto-generated and securely linked to your wallet.",
     },
     {
-      icon: "/assets/shield.svg",
-      title: "Collect Heroes",
-      description: "Discover and collect unique heroes with different abilities and rarities as NFTs.",
+      icon: "/assets/agent.svg",
+      title: "Agent Selection & Stats",
+      description: "Choose from a variety of unique agents, each with their own stats and abilities. Check the leaderboard to see which agents are strongest.",
     },
     {
-      icon: "/assets/potion.svg",
-      title: "Item Crafting",
-      description: "Craft powerful items and equipment to strengthen your heroes for tougher challenges.",
+      icon: "/assets/game-mode.svg",
+      title: "Multiple Game Modes",
+      description: "Pick your preferred battle format. Each mode offers unique rules, challenges, and rewards.",
     },
     {
-      icon: "/assets/chest.svg",
-      title: "Earn Rewards",
-      description: "Complete quests and dungeons to earn valuable tokens and rare treasure chests.",
+      icon: "/assets/ai.svg",
+      title: "AI Matchmaking",
+      description: "Get matched with a challenging AI agent for a fair and exciting battle experience.",
+    },
+    {
+      icon: "/assets/bet.svg",
+      title: "Betting System",
+      description: "Predict the winner and place your bet before each battle. Winners receive rewards, while losers pay their bet from their Phantom wallet.",
+    },
+    {
+      icon: "/assets/leaderboard.svg",
+      title: "Leaderboard",
+      description: "Track the top agents and players. Use the leaderboard to inform your agent selection and betting strategy.",
+    },
+    {
+      icon: "/assets/battle.svg",
+      title: "Strategic Battles",
+      description: "Engage in turn-based combat. Use your agent's abilities and tactics to outsmart your opponent and claim victory.",
+    },
+    {
+      icon: "/assets/reward.svg",
+      title: "Reward System",
+      description: "Winners automatically receive rewards. All transactions are handled securely through the Phantom wallet.",
     },
   ];
 
@@ -41,7 +61,7 @@ const Features = () => {
         <div className="max-w-3xl mx-auto mb-16 text-center">
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Game Features</h2>
           <p className="text-xl text-gray-400">
-            Discover what makes DeepDungeonDuel a unique gaming experience
+            Discover the innovative features that power DeepDungeonDuel's unique gameplay flow
           </p>
         </div>
         

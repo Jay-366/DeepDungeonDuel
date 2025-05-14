@@ -18,12 +18,6 @@ const CTA = () => {
           >
             Play Now
           </Link>
-          <Link
-            href="/wallet"
-            className="px-8 py-4 text-lg font-medium text-purple-100 transition-all bg-transparent border border-purple-400 rounded-lg hover:bg-purple-800/30 focus:ring-4 focus:ring-purple-400/50 min-w-[200px]"
-          >
-            Connect Wallet
-          </Link>
         </div>
         <p className="mt-8 text-sm text-purple-300">
           No wallet? <Link href="/guide" className="underline text-purple-200 hover:text-white">Learn how to get started</Link>

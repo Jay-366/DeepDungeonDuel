@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -74,10 +74,44 @@ const gameModes = [
   },
 ];
 
+// Simple Phantom wallet connection hook
+function usePhantomWallet() {
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [connecting, setConnecting] = useState(false);
+
+  useEffect(() => {
+    // Check if already connected
+    const { solana } = window as any;
+    if (solana && solana.isPhantom && solana.isConnected && solana.publicKey) {
+      setWalletAddress(solana.publicKey.toString());
+    }
+  }, []);
+
+  const connect = async () => {
+    setConnecting(true);
+    try {
+      const { solana } = window as any;
+      if (solana && solana.isPhantom) {
+        const resp = await solana.connect();
+        setWalletAddress(resp.publicKey.toString());
+      } else {
+        alert('Phantom wallet not found. Please install Phantom.');
+      }
+    } catch (e) {
+      // User rejected or error
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  return { walletAddress, connect, connecting };
+}
+
 export default function Play() {
   const [selectedChampion, setSelectedChampion] = useState<number | null>(null);
   const [selectedGameMode, setSelectedGameMode] = useState<string | null>(null);
   const router = useRouter();
+  const { walletAddress, connect, connecting } = usePhantomWallet();
 
   // Placeholder characters
   const characters = [
@@ -125,6 +159,26 @@ export default function Play() {
     }
   };
 
+  // If not connected, show only connect button
+  if (!walletAddress) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black to-purple-900/30">
+        <div className="bg-gray-900 rounded-xl shadow-lg p-10 flex flex-col items-center">
+          <Image src="/Phantom-Icon_Transparent_Purple.png" alt="Phantom Icon" width={60} height={60} className="mb-6" />
+          <h2 className="text-2xl font-bold text-white mb-4">Connect Phantom Wallet</h2>
+          <button
+            onClick={connect}
+            disabled={connecting}
+            className="flex items-center space-x-2 px-8 py-4 text-lg font-bold text-white bg-purple-600 border-2 border-purple-500 rounded-xl shadow-lg transition-all hover:bg-purple-700 hover:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400"
+          >
+            <Image src="/Phantom-Icon_Transparent_Purple.png" alt="Phantom Icon" width={28} height={28} />
+            <span>{connecting ? 'Connecting...' : 'Connect Phantom'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-purple-900/30 pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-6xl">
@@ -151,15 +205,23 @@ export default function Play() {
         <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 mb-12 max-w-xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-              <h2 className="text-xl font-bold text-white mb-1">Connect Your Wallet</h2>
-              <p className="text-gray-400">Access your collection and game progress</p>
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-gray-400">Wallet:</span>
+                <span className="text-white font-mono">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+              </div>
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-gray-400">Win Rate:</span>
+                <span className="text-white font-bold">72.5%</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-gray-400">Amount:</span>
+                <span className="text-white font-bold">1.23 SOL</span>
+              </div>
             </div>
-            <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              Connect Wallet
-            </button>
+            <div className="flex flex-col items-center justify-center">
+              <Image src="/Phantom-Icon_Transparent_Purple.png" alt="Phantom Icon" width={60} height={60} className="rounded-full border-4 border-purple-500 shadow-lg" />
+              <span className="text-xs text-gray-400 mt-2">Phantom Wallet</span>
+            </div>
           </div>
         </div>
 
@@ -177,7 +239,7 @@ export default function Play() {
                 level={character.level}
                 rarity={character.rarity}
                 selected={selectedChampion === character.id}
-                onClick={() => setSelectedChampion(character.id)}
+                onClick={() => setSelectedChampion(selectedChampion === character.id ? null : character.id)}
                 ModelComponent={character.ModelComponent}
                 modelProps={character.modelProps}
               />
@@ -188,18 +250,19 @@ export default function Play() {
         {/* Play Modes */}
         <div>
           <h2 className="text-2xl font-bold text-white mb-6">Game Modes</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {gameModes.map((mode) => (
               <div
                 key={mode.id}
-                className={`bg-gray-800/70 rounded-xl p-6 transition-colors cursor-pointer border-4 flex flex-col items-center hover:bg-gray-800 ${selectedGameMode === mode.id ? 'border-purple-400 bg-purple-900/40' : 'border-transparent'}`}
-                onClick={() => setSelectedGameMode(mode.id)}
+                className={`bg-gray-800/70 rounded-2xl p-8 transition-colors cursor-pointer border-4 flex flex-col items-center hover:bg-gray-800 shadow-lg ${selectedGameMode === mode.id ? 'border-purple-400 bg-purple-900/40' : 'border-transparent'}`}
+                onClick={() => setSelectedGameMode(selectedGameMode === mode.id ? null : mode.id)}
+                style={{ minHeight: 240 }}
               >
-                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mb-4">
+                <div className="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center mb-5">
                   {mode.icon}
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">{mode.name}</h3>
-                <p className="text-gray-400 mb-4">{mode.description}</p>
+                <p className="text-gray-400 mb-4 text-center">{mode.description}</p>
               </div>
             ))}
           </div>

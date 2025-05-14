@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Leaderboard from './Leaderboard';
+import Tutorial from './Tutorial';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md">
@@ -21,10 +23,29 @@ const Header = () => {
           <nav className="hidden md:flex md:items-center md:space-x-6">
             <Link href="/about" className="text-gray-300 hover:text-purple-400">About</Link>
             <Link href="/features" className="text-gray-300 hover:text-purple-400">Features</Link>
-            <Link href="/roadmap" className="text-gray-300 hover:text-purple-400">Roadmap</Link>
             <Link href="/marketplace" className="text-gray-300 hover:text-purple-400">Marketplace</Link>
             <button 
-              onClick={() => setIsLeaderboardOpen(!isLeaderboardOpen)}
+              onClick={() => {
+                setIsTutorialOpen(!isTutorialOpen);
+                setIsLeaderboardOpen(false);
+              }}
+              className="text-gray-300 hover:text-purple-400 flex items-center space-x-1"
+            >
+              <span>How to Play</span>
+              <svg 
+                className={`w-4 h-4 transition-transform ${isTutorialOpen ? 'rotate-180' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <button 
+              onClick={() => {
+                setIsLeaderboardOpen(!isLeaderboardOpen);
+                setIsTutorialOpen(false);
+              }}
               className="text-gray-300 hover:text-purple-400 flex items-center space-x-1"
             >
               <span>Leaderboard</span>
@@ -41,18 +62,7 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex md:items-center md:space-x-3">
-            <Link 
-              href="/play" 
-              className="px-4 py-2 text-sm font-medium text-white transition-all bg-purple-600 rounded-lg hover:bg-purple-700"
-            >
-              Play Now
-            </Link>
-            <Link 
-              href="/wallet" 
-              className="px-4 py-2 text-sm font-medium text-white transition-all border border-white/20 rounded-lg hover:bg-white/10"
-            >
-              Connect Wallet
-            </Link>
+            {/* No Connect Phantom button here anymore */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -79,6 +89,15 @@ const Header = () => {
         </div>
       </div>
 
+      {/* Tutorial Dropdown */}
+      {isTutorialOpen && (
+        <div className="absolute top-20 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800">
+          <div className="container px-4 mx-auto py-6">
+            <Tutorial />
+          </div>
+        </div>
+      )}
+
       {/* Leaderboard Dropdown */}
       {isLeaderboardOpen && (
         <div className="absolute top-20 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800">
@@ -94,10 +113,29 @@ const Header = () => {
           <nav className="flex flex-col space-y-4">
             <Link href="/about" className="text-gray-300 hover:text-purple-400">About</Link>
             <Link href="/features" className="text-gray-300 hover:text-purple-400">Features</Link>
-            <Link href="/roadmap" className="text-gray-300 hover:text-purple-400">Roadmap</Link>
             <Link href="/marketplace" className="text-gray-300 hover:text-purple-400">Marketplace</Link>
             <button 
-              onClick={() => setIsLeaderboardOpen(!isLeaderboardOpen)}
+              onClick={() => {
+                setIsTutorialOpen(!isTutorialOpen);
+                setIsLeaderboardOpen(false);
+              }}
+              className="text-gray-300 hover:text-purple-400 flex items-center justify-between"
+            >
+              <span>How to Play</span>
+              <svg 
+                className={`w-4 h-4 transition-transform ${isTutorialOpen ? 'rotate-180' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <button 
+              onClick={() => {
+                setIsLeaderboardOpen(!isLeaderboardOpen);
+                setIsTutorialOpen(false);
+              }}
               className="text-gray-300 hover:text-purple-400 flex items-center justify-between"
             >
               <span>Leaderboard</span>
@@ -111,20 +149,18 @@ const Header = () => {
               </svg>
             </button>
             <div className="flex flex-col pt-4 mt-4 space-y-2 border-t border-gray-800">
-              <Link 
-                href="/play" 
-                className="px-4 py-2 text-sm font-medium text-white text-center transition-all bg-purple-600 rounded-lg hover:bg-purple-700"
-              >
-                Play Now
-              </Link>
-              <Link 
-                href="/wallet" 
-                className="px-4 py-2 text-sm font-medium text-white text-center transition-all border border-white/20 rounded-lg hover:bg-white/10"
-              >
-                Connect Wallet
-              </Link>
+              {/* No Connect Phantom button here anymore */}
             </div>
           </nav>
+        </div>
+      )}
+
+      {/* Mobile Tutorial */}
+      {isMenuOpen && isTutorialOpen && (
+        <div className="px-4 pt-2 pb-4 bg-black md:hidden">
+          <div className="mt-4 border-t border-gray-800 pt-4">
+            <Tutorial />
+          </div>
         </div>
       )}
 
