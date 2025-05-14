@@ -4,7 +4,7 @@ import Image from 'next/image';
 const FeatureCard = ({ icon, title, description }: { icon: string, title: string, description: string }) => (
   <div className="flex flex-col items-center p-6 transition-all bg-gray-800/70 rounded-xl hover:bg-gray-800">
     <div className="flex items-center justify-center w-16 h-16 mb-4 bg-purple-600 rounded-full">
-      <Image src={icon} alt={title} width={32} height={32} className="text-white" />
+      <Image src={icon} alt={title} width={40} height={40} className="text-white" />
     </div>
     <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
     <p className="text-center text-gray-400">{description}</p>
@@ -19,37 +19,37 @@ const Features = () => {
       description: "Seamlessly connect your Phantom wallet to start playing. Your account is auto-generated and securely linked to your wallet.",
     },
     {
-      icon: "/assets/agent.svg",
+      icon: "/assets/Agent Selection & Stats.png",
       title: "Agent Selection & Stats",
       description: "Choose from a variety of unique agents, each with their own stats and abilities. Check the leaderboard to see which agents are strongest.",
     },
     {
-      icon: "/assets/game-mode.svg",
+      icon: "/assets/Multiple Game Modes.png",
       title: "Multiple Game Modes",
       description: "Pick your preferred battle format. Each mode offers unique rules, challenges, and rewards.",
     },
     {
-      icon: "/assets/ai.svg",
+      icon: "/assets/AI Matchmaking.png",
       title: "AI Matchmaking",
       description: "Get matched with a challenging AI agent for a fair and exciting battle experience.",
     },
     {
-      icon: "/assets/bet.svg",
+      icon: "/assets/Betting System.png",
       title: "Betting System",
       description: "Predict the winner and place your bet before each battle. Winners receive rewards, while losers pay their bet from their Phantom wallet.",
     },
     {
-      icon: "/assets/leaderboard.svg",
+      icon: "/assets/Leaderboard.png",
       title: "Leaderboard",
       description: "Track the top agents and players. Use the leaderboard to inform your agent selection and betting strategy.",
     },
     {
-      icon: "/assets/battle.svg",
+      icon: "/assets/Strategic Battles.png",
       title: "Strategic Battles",
       description: "Engage in turn-based combat. Use your agent's abilities and tactics to outsmart your opponent and claim victory.",
     },
     {
-      icon: "/assets/reward.svg",
+      icon: "/assets/Reward System.png",
       title: "Reward System",
       description: "Winners automatically receive rewards. All transactions are handled securely through the Phantom wallet.",
     },

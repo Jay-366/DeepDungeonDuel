@@ -21,7 +21,7 @@ export default function ResultPage() {
   const payout = bet * odds;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black to-purple-900/30 px-4 py-12">
+    <div style={{ background: "url('/assets/DungeonBackground.png') center center / cover no-repeat, linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(88,28,135,0.6))" }} className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black to-purple-900/30 px-4 py-12">
       <div className="bg-gray-900/90 rounded-2xl shadow-2xl p-8 w-full max-w-2xl">
         <h1 className="text-3xl font-bold text-center text-white mb-6">Battle Result</h1>
         <div className="flex justify-between items-center mb-6">
