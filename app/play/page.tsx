@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Canvas } from '@react-three/fiber';
+import { FaShieldAlt, FaUsers, FaTrophy } from 'react-icons/fa';
+import { Connection } from "@solana/web3.js";
 
 const Grog = dynamic(() => import('../../public/model/Grog_the_adventurer').then(mod => mod.Model), { ssr: false });
 const Batman = dynamic(() => import('../../public/model/Marvel_rivals_-_batman_beyond_fanart').then(mod => mod.Model), { ssr: false });
@@ -78,12 +80,25 @@ const gameModes = [
 function usePhantomWallet() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [balance, setBalance] = useState<string | null>(null);
+
+  const fetchBalance = async (publicKey: any) => {
+    try {
+      const connection = new Connection("https://api.devnet.solana.com");
+      const balanceInLamports = await connection.getBalance(publicKey);
+      const solBalance = (balanceInLamports / 1000000000).toFixed(3);
+      setBalance(`${solBalance} SOL`);
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      setBalance("Error");
+    }
+  };
 
   useEffect(() => {
-    // Check if already connected
     const { solana } = window as any;
     if (solana && solana.isPhantom && solana.isConnected && solana.publicKey) {
       setWalletAddress(solana.publicKey.toString());
+      fetchBalance(solana.publicKey);
     }
   }, []);
 
@@ -94,6 +109,7 @@ function usePhantomWallet() {
       if (solana && solana.isPhantom) {
         const resp = await solana.connect();
         setWalletAddress(resp.publicKey.toString());
+        fetchBalance(resp.publicKey);
       } else {
         alert('Phantom wallet not found. Please install Phantom.');
       }
@@ -104,14 +120,14 @@ function usePhantomWallet() {
     }
   };
 
-  return { walletAddress, connect, connecting };
+  return { walletAddress, connect, connecting, balance };
 }
 
 export default function Play() {
   const [selectedChampion, setSelectedChampion] = useState<number | null>(null);
   const [selectedGameMode, setSelectedGameMode] = useState<string | null>(null);
   const router = useRouter();
-  const { walletAddress, connect, connecting } = usePhantomWallet();
+  const { walletAddress, connect, connecting, balance } = usePhantomWallet();
 
   // Placeholder characters
   const characters = [
@@ -215,7 +231,7 @@ export default function Play() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-gray-400">Amount:</span>
-                <span className="text-white font-bold">1.23 SOL</span>
+                <span className="text-white font-bold">{balance || 'Loading...'}</span>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center">

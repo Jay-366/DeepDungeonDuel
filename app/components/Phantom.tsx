@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Image from "next/image";
+import { Connection } from "@solana/web3.js";
 
 // Context type
 interface PhantomContextType {
@@ -71,8 +72,19 @@ export const ConnectPhantomButton = ({ onConnect }: { onConnect?: () => void }) 
       const resp = await solana.connect();
       setWalletAddress(resp.publicKey.toString());
       setShowCard(true);
-      // Fetch balance (optional, mock for now)
-      setBalance("1.23 SOL");
+      
+      // Fetch real balance from Phantom wallet
+      try {
+        const connection = new Connection("https://api.devnet.solana.com");
+        const balance = await connection.getBalance(resp.publicKey);
+        // Convert lamports to SOL (1 SOL = 10^9 lamports)
+        const solBalance = (balance / 1000000000).toFixed(3);
+        setBalance(`${solBalance} SOL`);
+      } catch (balanceError) {
+        console.error("Error fetching balance:", balanceError);
+        setBalance("Error fetching balance");
+      }
+      
       if (onConnect) onConnect();
     } catch (e) {
       // User rejected or error
@@ -118,6 +130,30 @@ export const PhantomWalletCard = ({ walletAddress, balance }: { walletAddress: s
 // Wallet Info component (mock win rate and amount)
 export const PhantomWalletInfo = () => {
   const { walletAddress } = usePhantom();
+  const [balance, setBalance] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!walletAddress) return;
+      
+      try {
+        const { solana } = window as any;
+        if (solana && solana.isPhantom) {
+          const connection = new Connection("https://api.devnet.solana.com");
+          const publicKey = solana.publicKey;
+          const balanceInLamports = await connection.getBalance(publicKey);
+          const solBalance = (balanceInLamports / 1000000000).toFixed(3);
+          setBalance(`${solBalance} SOL`);
+        }
+      } catch (error) {
+        console.error("Error fetching balance:", error);
+        setBalance("Error");
+      }
+    };
+    
+    fetchBalance();
+  }, [walletAddress]);
+  
   if (!walletAddress) return null;
   return (
     <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 mb-12 max-w-xl mx-auto">
@@ -134,7 +170,7 @@ export const PhantomWalletInfo = () => {
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-gray-400">Amount:</span>
-          <span className="text-white font-bold">1.23 SOL</span>
+          <span className="text-white font-bold">{balance || 'Loading...'}</span>
         </div>
       </div>
       <div className="flex flex-col items-center justify-center">

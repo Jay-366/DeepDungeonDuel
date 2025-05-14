@@ -91,7 +91,7 @@ const Bet: React.FC<BetProps> = ({ userAgent, enemyAgent, walletAddress, balance
       <div className="w-full max-w-md mx-auto bg-gray-800 rounded-xl p-6 flex flex-col items-center mb-6">
         <div className="flex items-center mb-4 w-full justify-between">
           <span className="text-white font-bold text-lg">Bet Amount (SOL)</span>
-          <span className="text-gray-400 text-sm">Balance: {balance}</span>
+          <span className="text-gray-400 text-sm">Balance: {balance.includes('SOL') ? balance : `${balance} SOL`}</span>
         </div>
         <div className="flex gap-4 mb-4 w-full justify-center">
           {presetAmounts.map((amt) => (
