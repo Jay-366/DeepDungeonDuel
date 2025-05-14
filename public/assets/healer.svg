@@ -1,0 +1,39 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Healer Character -->
+  <!-- Head/Crown -->
+  <circle cx="100" cy="70" r="25" fill="#64748B" />
+  <path d="M75 65H125V75C125 85 115 95 100 95C85 95 75 85 75 75V65Z" fill="#F9A8D4" />
+  <path d="M75 65H125V70C125 75 120 80 115 80H85C80 80 75 75 75 70V65Z" fill="#F472B6" />
+  <path d="M85 65V60H90V50H110V60H115V65H85Z" fill="#F472B6" />
+  <path d="M90 50H110V55H90V50Z" fill="#FDF2F8" />
+  <circle cx="92" cy="72" r="3" fill="white" />
+  <circle cx="92" cy="72" r="1.5" fill="#1E293B" />
+  <circle cx="108" cy="72" r="3" fill="white" />
+  <circle cx="108" cy="72" r="1.5" fill="#1E293B" />
+  
+  <!-- Body/Robe -->
+  <path d="M80 95V135C85 145 115 145 120 135V95H80Z" fill="#F9A8D4" />
+  <path d="M90 105H110V125H90V105Z" fill="#FDF2F8" />
+  <path d="M98 105V125M90 115H110" stroke="#F472B6" stroke-width="2" />
+  
+  <!-- Cloak -->
+  <path d="M80 95C60 100 55 140 55 155C75 145 90 145 100 150C110 145 125 145 145 155C145 140 140 100 120 95" fill="#F472B6" />
+  
+  <!-- Arms -->
+  <rect x="80" y="95" width="8" height="30" rx="4" fill="#F9A8D4" />
+  <rect x="112" y="95" width="8" height="30" rx="4" fill="#F9A8D4" />
+  <circle cx="84" cy="130" r="6" fill="#F9A8D4" />
+  <circle cx="116" cy="130" r="6" fill="#F9A8D4" />
+  
+  <!-- Staff -->
+  <rect x="130" y="90" width="6" height="80" rx="3" fill="#92400E" />
+  <path d="M118 95C123 90 128 85 133 80C138 85 143 90 148 95C143 100 138 105 133 110C128 105 123 100 118 95Z" fill="#FDF2F8" />
+  <path d="M123 95C127 91 129 89 133 85C137 89 139 91 143 95C139 99 137 101 133 105C129 101 127 99 123 95Z" fill="#F472B6" />
+  <circle cx="133" cy="95" r="5" fill="#FDF2F8" />
+  
+  <!-- Legs -->
+  <path d="M85 135L80 170H90L92 135C90 136 87 136 85 135Z" fill="#F9A8D4" />
+  <path d="M115 135L120 170H110L108 135C110 136 113 136 115 135Z" fill="#F9A8D4" />
+  <rect x="80" y="170" width="10" height="5" rx="2" fill="#F472B6" />
+  <rect x="110" y="170" width="10" height="5" rx="2" fill="#F472B6" />
+</svg> 

@@ -1,0 +1,91 @@
+<svg width="800" height="400" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- HP Bar Template -->
+  <g id="hp-bar">
+    <rect x="10" y="10" width="200" height="25" rx="5" fill="#1F2937" stroke="#4B5563" stroke-width="2" />
+    <rect x="15" y="15" width="190" height="15" rx="3" fill="#374151" />
+    <rect x="15" y="15" width="150" height="15" rx="3" fill="#65A30D" /> <!-- 75% HP -->
+    <text x="20" y="27" font-family="monospace" font-size="12" fill="white">HP: 75/100</text>
+  </g>
+  
+  <!-- Energy Bar Template -->
+  <g id="energy-bar">
+    <rect x="10" y="45" width="200" height="20" rx="5" fill="#1F2937" stroke="#4B5563" stroke-width="2" />
+    <rect x="15" y="50" width="190" height="10" rx="3" fill="#374151" />
+    <rect x="15" y="50" width="114" height="10" rx="3" fill="#7C3AED" /> <!-- 60% Energy -->
+    <text x="20" y="77" font-family="monospace" font-size="12" fill="white">Energy: 60/100</text>
+  </g>
+  
+  <!-- Action Button Template -->
+  <g id="action-button-normal">
+    <rect x="10" y="100" width="120" height="40" rx="5" fill="#4B5563" stroke="#6B7280" stroke-width="2" />
+    <text x="70" y="125" font-family="sans-serif" font-size="14" fill="white" text-anchor="middle">Attack</text>
+  </g>
+  
+  <!-- Action Button Hover -->
+  <g id="action-button-hover">
+    <rect x="140" y="100" width="120" height="40" rx="5" fill="#6B7280" stroke="#9CA3AF" stroke-width="2" />
+    <text x="200" y="125" font-family="sans-serif" font-size="14" fill="white" text-anchor="middle">Skill</text>
+  </g>
+  
+  <!-- Action Button Active -->
+  <g id="action-button-active">
+    <rect x="270" y="100" width="120" height="40" rx="5" fill="#7C3AED" stroke="#A855F7" stroke-width="2" />
+    <text x="330" y="125" font-family="sans-serif" font-size="14" fill="white" text-anchor="middle">Defend</text>
+  </g>
+  
+  <!-- Turn Indicator -->
+  <g id="turn-indicator">
+    <rect x="10" y="150" width="150" height="40" rx="20" fill="#7C3AED" />
+    <text x="85" y="175" font-family="sans-serif" font-size="14" fill="white" text-anchor="middle">Your Turn!</text>
+  </g>
+  
+  <!-- Battle Log -->
+  <g id="battle-log">
+    <rect x="400" y="10" width="380" height="180" rx="5" fill="#1F2937" stroke="#4B5563" stroke-width="2" />
+    <text x="410" y="30" font-family="monospace" font-size="12" fill="white">Battle Log:</text>
+    <text x="410" y="50" font-family="monospace" font-size="12" fill="#9CA3AF">Warrior used Attack! 15 damage.</text>
+    <text x="410" y="70" font-family="monospace" font-size="12" fill="#9CA3AF">Mage used Fireball! 25 damage.</text>
+    <text x="410" y="90" font-family="monospace" font-size="12" fill="#9CA3AF">Warrior used Defend! Damage reduced.</text>
+    <text x="410" y="110" font-family="monospace" font-size="12" fill="white">Mage used Ice Spike! 20 damage.</text>
+  </g>
+  
+  <!-- Status Effect Icons -->
+  <g id="status-effects">
+    <circle cx="400" y="150" r="15" fill="#FCD34D" /> <!-- Buff -->
+    <text x="400" y="155" font-family="sans-serif" font-size="12" fill="#7C2D12" text-anchor="middle">+</text>
+    
+    <circle cx="440" y="150" r="15" fill="#FCA5A5" /> <!-- Debuff -->
+    <text x="440" y="155" font-family="sans-serif" font-size="12" fill="#7F1D1D" text-anchor="middle">-</text>
+    
+    <circle cx="480" y="150" r="15" fill="#A7F3D0" /> <!-- Heal -->
+    <text x="480" y="155" font-family="sans-serif" font-size="10" fill="#064E3B" text-anchor="middle">HP</text>
+  </g>
+  
+  <!-- Victory Screen -->
+  <g id="victory-screen">
+    <rect x="10" y="200" width="380" height="180" rx="10" fill="#065F46" stroke="#059669" stroke-width="3" />
+    <text x="200" y="250" font-family="sans-serif" font-size="24" fill="white" text-anchor="middle">VICTORY!</text>
+    <text x="200" y="280" font-family="sans-serif" font-size="16" fill="white" text-anchor="middle">You defeated the enemy!</text>
+    <rect x="125" y="300" width="150" height="50" rx="5" fill="#7C3AED" stroke="#A855F7" stroke-width="2" />
+    <text x="200" y="330" font-family="sans-serif" font-size="16" fill="white" text-anchor="middle">Continue</text>
+  </g>
+  
+  <!-- Defeat Screen -->
+  <g id="defeat-screen">
+    <rect x="400" y="200" width="380" height="180" rx="10" fill="#7F1D1D" stroke="#B91C1C" stroke-width="3" />
+    <text x="590" y="250" font-family="sans-serif" font-size="24" fill="white" text-anchor="middle">DEFEAT!</text>
+    <text x="590" y="280" font-family="sans-serif" font-size="16" fill="white" text-anchor="middle">You were defeated...</text>
+    <rect x="515" y="300" width="150" height="50" rx="5" fill="#6B7280" stroke="#9CA3AF" stroke-width="2" />
+    <text x="590" y="330" font-family="sans-serif" font-size="16" fill="white" text-anchor="middle">Try Again</text>
+  </g>
+  
+  <!-- Damage Number -->
+  <g id="damage-number">
+    <text x="100" y="370" font-family="sans-serif" font-weight="bold" font-size="24" fill="#EF4444" stroke="#7F1D1D" stroke-width="1">-25</text>
+  </g>
+  
+  <!-- Heal Number -->
+  <g id="heal-number">
+    <text x="170" y="370" font-family="sans-serif" font-weight="bold" font-size="24" fill="#10B981" stroke="#065F46" stroke-width="1">+15</text>
+  </g>
+</svg> 

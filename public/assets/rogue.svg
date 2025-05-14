@@ -1,0 +1,40 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rogue Character -->
+  <!-- Head/Hood -->
+  <circle cx="100" cy="70" r="25" fill="#475569" />
+  <path d="M75 70C80 55 120 55 125 70L120 95H80L75 70Z" fill="#334155" />
+  <path d="M82 70C85 60 115 60 118 70L115 90H85L82 70Z" fill="#475569" />
+  <circle cx="92" cy="70" r="3" fill="white" />
+  <circle cx="92" cy="70" r="1.5" fill="#1E293B" />
+  <circle cx="108" cy="70" r="3" fill="white" />
+  <circle cx="108" cy="70" r="1.5" fill="#1E293B" />
+  
+  <!-- Body/Leather Armor -->
+  <path d="M80 95V135C85 145 115 145 120 135V95H80Z" fill="#334155" />
+  <path d="M85 105H115V120C115 125 110 125 110 120V115H90V120C90 125 85 125 85 120V105Z" fill="#475569" />
+  <rect x="90" y="125" width="20" height="10" fill="#475569" />
+  
+  <!-- Cloak -->
+  <path d="M80 95C60 100 55 140 55 155C75 145 90 145 100 150C110 145 125 145 145 155C145 140 140 100 120 95" fill="#334155" />
+  
+  <!-- Arms -->
+  <rect x="75" y="95" width="10" height="35" rx="5" fill="#334155" />
+  <rect x="115" y="95" width="10" height="35" rx="5" fill="#334155" />
+  <circle cx="80" cy="135" r="7" fill="#475569" />
+  <circle cx="120" cy="135" r="7" fill="#475569" />
+  
+  <!-- Weapons -->
+  <path d="M60 120L75 135L80 130L65 115L60 120Z" fill="#94A3B8" />
+  <rect x="60" y="120" width="5" height="15" rx="2" transform="rotate(-45 60 120)" fill="#64748B" />
+  <path d="M140 120L125 135L120 130L135 115L140 120Z" fill="#94A3B8" />
+  <rect x="135" y="115" width="5" height="15" rx="2" transform="rotate(45 135 115)" fill="#64748B" />
+  
+  <!-- Legs -->
+  <rect x="90" y="135" width="8" height="40" rx="4" fill="#334155" />
+  <rect x="102" y="135" width="8" height="40" rx="4" fill="#334155" />
+  <rect x="90" y="175" width="8" height="5" rx="2" fill="#1E293B" />
+  <rect x="102" y="175" width="8" height="5" rx="2" fill="#1E293B" />
+  
+  <!-- Belt -->
+  <rect x="85" y="135" width="30" height="5" rx="2" fill="#64748B" />
+</svg> 
