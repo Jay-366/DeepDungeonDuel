@@ -1,0 +1,60 @@
+{
+  "version": "0.1.0",
+  "name": "game_reward_system",
+  "instructions": [
+    {
+      "name": "playGame",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "win",
+          "type": "bool"
+        },
+        {
+          "name": "transferredAmount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GameConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "transferAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}
