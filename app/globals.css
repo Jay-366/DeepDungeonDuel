@@ -1,4 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
 @import "tailwindcss";
+
 
 :root {
   --background: #ffffff;
@@ -20,7 +22,30 @@
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #18122b 0%, #2d1e4a 100%);
+  /* Optional: overlay a subtle dungeon pattern */
+  background-image: url('/dungeon-texture.png'), linear-gradient(135deg, #18122b 0%, #2d1e4a 100%);
+  background-blend-mode: overlay;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+h1, h2, .fantasy-title {
+  font-family: 'UnifrakturCook', cursive;
+  letter-spacing: 1px;
+}
+
+.stone-border {
+  border-width: 4px;
+  border-style: dashed;
+  border-color: #4b5563;
+  border-radius: 1rem;
+}
+
+.glow {
+  box-shadow: 0 0 16px 2px #a78bfa, 0 0 4px 1px #fff1;
+}
+
+.torch-icon {
+  filter: drop-shadow(0 0 8px #fbbf24);
 }

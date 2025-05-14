@@ -41,13 +41,6 @@ const Hero = () => {
           )}
         </div>
       </div>
-      {/* Floating elements */}
-      <div className="absolute bottom-10 left-10 animate-float hidden md:block">
-        <Image src="/assets/sword.svg" alt="Sword" width={80} height={80} className="opacity-60" />
-      </div>
-      <div className="absolute bottom-10 right-10 animate-float hidden md:block">
-        <Image src="/assets/shield.svg" alt="Shield" width={70} height={70} className="opacity-60" />
-      </div>
     </section>
   );
 };

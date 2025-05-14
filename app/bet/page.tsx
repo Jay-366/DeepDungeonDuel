@@ -35,7 +35,6 @@ export default function BetPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-purple-900/30 flex flex-col">
-      <Header />
       <main className="flex flex-1 flex-col items-center justify-center py-12 px-4">
         <Bet
           userAgent={userAgent}
