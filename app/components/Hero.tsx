@@ -17,7 +17,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative flex flex-col items-center justify-center min-h-screen p-8 overflow-hidden bg-gradient-to-b from-black/80 to-purple-900/60">
+    <section className="relative flex flex-col items-center justify-center min-h-screen p-8 overflow-hidden" style={{ background: "url('/assets/DungeonBackground.png') center center / cover no-repeat, linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(88,28,135,0.6))" }}>
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-2xl mx-auto text-center space-y-8">
         <div>

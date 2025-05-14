@@ -26,7 +26,7 @@ const BattleLoading = () => {
 
 export default function BattlePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-black to-purple-900/30 pt-24 pb-12 px-4">
+    <div style={{ background: "url('/assets/DungeonBackground.png') center center / cover no-repeat, linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(88,28,135,0.6))" }} className="min-h-screen flex flex-col bg-gradient-to-b from-black to-purple-900/30 pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-7xl flex flex-col flex-grow">
         {/* Back button */}
         <Link
