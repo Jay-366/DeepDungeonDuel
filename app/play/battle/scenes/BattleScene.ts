@@ -380,8 +380,21 @@ export default class BattleScene extends Phaser.Scene {
     }).setOrigin(0.5);
     
     continueButton.on('pointerdown', () => {
-      // Navigate back to main game or next battle
-      this.scene.start('BattleScene'); // For testing, just restart the scene
+      // Navigate to result page with battle data
+      // TODO: Replace with real data from the battle
+      const resultData = {
+        winner: 'Eldric', // Replace with actual winner
+        loser: 'Blue Witch', // Replace with actual loser
+        bet: 1.23, // Replace with actual bet
+        odds: 1.5, // Replace with actual odds
+        history: [
+          { agent: 'Eldric', action: 'Attack', amount: 20 },
+          { agent: 'Blue Witch', action: 'Spell', amount: 15 },
+        ], // Replace with actual damage history
+      };
+      if (typeof window !== 'undefined' && (window as any).goToBattleResult) {
+        (window as any).goToBattleResult(resultData);
+      }
     });
   }
 

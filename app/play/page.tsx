@@ -155,7 +155,7 @@ export default function Play() {
 
   const handleStartPlay = () => {
     if (selectedChampion && selectedGameMode === 'campaign') {
-      router.push('/play/battle');
+      router.push('/bet');
     }
   };
 

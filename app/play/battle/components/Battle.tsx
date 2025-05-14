@@ -4,10 +4,12 @@ import React, { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import BattleScene from '../scenes/BattleScene';
 import ChatInterface from './ChatInterface';
+import { useRouter } from 'next/navigation';
 
 export default function Battle() {
   const gameRef = useRef<Phaser.Game | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (containerRef.current && !gameRef.current) {
@@ -46,6 +48,25 @@ export default function Battle() {
       };
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).goToBattleResult = (resultData: any) => {
+        const { winner, loser, bet, odds, history } = resultData;
+        const params = new URLSearchParams({
+          winner,
+          loser,
+          bet: String(bet),
+          odds: String(odds),
+          history: JSON.stringify(history),
+        });
+        router.push(`/play/result?${params.toString()}`);
+      };
+      return () => {
+        delete (window as any).goToBattleResult;
+      };
+    }
+  }, [router]);
 
   return (
     <div className="w-full h-full flex items-center justify-start gap-30 px-4">
