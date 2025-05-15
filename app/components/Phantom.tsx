@@ -127,7 +127,7 @@ export const PhantomWalletCard = ({ walletAddress, balance }: { walletAddress: s
   </div>
 );
 
-export const PlayPhantomWalletCard = ({ walletAddress, winRate, amount }: { walletAddress: string; winRate: number; amount: string }) => (
+export const PlayPhantomWalletCard = ({ walletAddress, winRate, amount, balance }: { walletAddress: string; winRate: number; amount?: string; balance?: string | null }) => (
   <div className="relative flex flex-col items-center w-full max-w-md mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-6 mb-12 shadow-lg border-4 border-purple-700/40 space-y-2 animate-fade-in text-center">
     <button className="absolute top-3 right-3 p-2 bg-purple-400/90 rounded-full shadow-lg ring-2 ring-purple-600 hover:bg-purple-300 transition z-20" aria-label="Edit Wallet Info">
       <Image src="/assets/edit.png" alt="Edit" width={25} height={25} />
@@ -137,15 +137,15 @@ export const PlayPhantomWalletCard = ({ walletAddress, winRate, amount }: { wall
       <div className="flex flex-col items-center">
         <span className="text-gray-400 fantasy-title">Wallet:</span>
         <span className="text-white font-mono fantasy-title">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
-      </div>
+        </div>
       <div className="flex flex-col items-center">
         <span className="text-gray-400 fantasy-title">Win Rate:</span>
         <span className="text-white font-bold fantasy-title">{winRate}%</span>
       </div>
       <div className="flex flex-col items-center">
         <span className="text-gray-400 fantasy-title">Amount:</span>
-        <span className="text-white font-bold fantasy-title">{amount} SOL</span>
+        <span className="text-white font-bold fantasy-title">{balance || amount || 'Loading...'} SOL</span>
+      </div>
       </div>
     </div>
-  </div>
-);
+  );
