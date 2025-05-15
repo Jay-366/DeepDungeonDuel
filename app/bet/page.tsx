@@ -76,20 +76,14 @@ export default function BetPage() {
   }, [router]);
 
   const handleBattle = (betAgentId: number, amount: number) => {
-    // Get the selected agent and opposing agent
-    const selectedAgent = betAgentId === userAgent.id ? userAgent : enemyAgent;
-    const opposingAgent = betAgentId === userAgent.id ? enemyAgent : userAgent;
+    // Store bet information in localStorage to access it in the battle/result page
+    localStorage.setItem('betAmount', amount.toString());
+    localStorage.setItem('betAgentId', betAgentId.toString());
+    localStorage.setItem('betAgentName', betAgentId === userAgent.id ? userAgent.name : enemyAgent.name);
+    localStorage.setItem('odds', betAgentId === userAgent.id ? userAgent.odds.toString() : enemyAgent.odds.toString());
     
-    // Create query params with real bet amount and odds
-    const queryParams = new URLSearchParams({
-      bet: amount.toString(),
-      odds: selectedAgent.odds.toString(),
-      player: selectedAgent.name,
-      opponent: opposingAgent.name
-    }).toString();
-    
-    // Navigate to battle page with parameters
-    router.push(`/play/battle?${queryParams}`);
+    // Navigate to battle page
+    router.push('/play/battle');
   };
 
   return (
