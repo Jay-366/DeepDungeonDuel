@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DeepDungeonDuel
+
+An immersive fantasy battle game built on Next.js with Solana blockchain integration for betting and rewards.
+
+## Overview
+
+DeepDungeonDuel allows players to:
+
+- Select pixel-art fantasy characters
+- Place SOL bets on battle outcomes
+- Experience auto-battling gameplay with dynamic visuals
+- Earn rewards through the Solana blockchain
+
+## Features
+
+- **Character Selection**: Choose from unique warriors, mages, and other fantasy heroes
+- **Solana Integration**: Place bets and receive payouts using SOL tokens
+- **Auto-battling System**: Watch battles unfold with strategic AI-driven combat
+- **Blockchain Rewards**: Secure and transparent reward distribution
+- **Responsive Design**: Works across desktop and mobile devices
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TailwindCSS
+- **Blockchain**: Solana Web3.js, Phantom Wallet integration
+- **Game Engine**: Phaser 3
+- **Deployment**: Vercel
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- Phantom Wallet browser extension
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/DeepDungeonDuel.git
+cd DeepDungeonDuel
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Game Instructions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Connect Wallet**: Connect your Phantom wallet to access the game
+2. **Select Character**: Choose your champion from the available characters
+3. **Place Bet**: Choose a bet amount in SOL
+4. **Battle**: Watch the auto-battle unfold
+5. **Collect Rewards**: If you win, the rewards will be sent to your wallet
 
-## Learn More
+## Smart Contract
 
-To learn more about Next.js, take a look at the following resources:
+The game interacts with a Solana smart contract for handling bets and rewards:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Contract Address: `AP62gFAAsUSdKqCxhgkzyqGxwbP5Hhs4SBSUb4ARtXyz`
+- Vault Address: `GSWRs4nTNQMgePRpiC57tPxLBo9XpywoUcs5MqvGrHjq`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+The easiest way to deploy is using Vercel:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push your code to a Git repository
+2. Connect your repository to [Vercel](https://vercel.com)
+3. Vercel will automatically detect Next.js and deploy your application
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Environment Variables
+
+No additional environment variables are required for basic operation.
+
+## License
+
+This project is licensed under the MIT License.
