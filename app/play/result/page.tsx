@@ -30,7 +30,8 @@ export default function ResultPage() {
   const [gameResult, setGameResult] = useState<null | {win: boolean; transaction: string}>(null);
   const [transactionProcessed, setTransactionProcessed] = useState(false);
   const [processingAttempted, setProcessingAttempted] = useState(false);
-  const [isWalletReady, setIsWalletReady] = useState(false);
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const [autoConnectAttempted, setAutoConnectAttempted] = useState(false);
 
   // Get data from query params
   const winner = params.get("winner") || "Unknown";
@@ -50,15 +51,6 @@ export default function ResultPage() {
   
   // Initialize betAmount with the appropriate value based on win/loss
   const [betAmount] = useState<string>(userBetWon ? payout : lossAmount);
-
-  // Check if wallet is ready
-  useEffect(() => {
-    if (connected && publicKey) {
-      setIsWalletReady(true);
-    } else {
-      setIsWalletReady(false);
-    }
-  }, [connected, publicKey]);
 
   // Parse damage history with fallback
   let damageHistory: any[] = [];
@@ -136,15 +128,15 @@ export default function ResultPage() {
 
   const handleConnectWallet = async () => {
     try {
+      setWalletError(null);
       if (connect) {
         await connect();
         toast.success("Wallet connected!");
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      // Don't display error toast here - it's distracting for users
-      // Instead, just inform user they need to connect
-      toast.error("Please connect your Phantom wallet to continue");
+      setWalletError("Failed to connect wallet. Please try again.");
+      toast.error("Please connect your wallet manually");
     }
   };
 
@@ -159,7 +151,8 @@ export default function ResultPage() {
     if (!publicKey || !connected) {
       console.log("Wallet not connected or public key not available");
       setIsLoading(false);
-      setProcessingAttempted(false); // Reset so user can try again
+      setProcessingAttempted(false);
+      setWalletError("Please connect your wallet to continue");
       return;
     }
     
@@ -170,6 +163,7 @@ export default function ResultPage() {
 
     try {
       setIsLoading(true);
+      setWalletError(null);
       
       const amountInSol = parseFloat(betAmount);
       // Convert SOL to lamports (1 SOL = 1,000,000,000 lamports)
@@ -230,21 +224,24 @@ export default function ResultPage() {
     } catch (error) {
       console.error("Game error:", error);
       
-      // Check if it's a wallet-related error and provide appropriate message
-      let errorMessage = "Unknown error";
+      // Handle specific wallet errors
+      let errorMessage = "An error occurred while processing your transaction";
       
       if (error instanceof Error) {
-        if (error.message.includes("Wallet not selected")) {
-          errorMessage = "Please connect your Phantom wallet";
-          setProcessingAttempted(false); // Allow retry
+        // Check for specific error types
+        if (error.message.includes("Wallet not selected") || 
+            error.message.includes("WalletNotSelected")) {
+          errorMessage = "Please connect your wallet first";
+          setProcessingAttempted(false);
         } else if (error.message.includes("User rejected")) {
           errorMessage = "Transaction was rejected in your wallet";
-          setProcessingAttempted(false); // Allow retry
+          setProcessingAttempted(false);
         } else {
           errorMessage = error.message;
         }
       }
       
+      setWalletError(errorMessage);
       toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
@@ -263,23 +260,14 @@ export default function ResultPage() {
     userBetWon
   ]);
   
-  // Run once when component mounts and wallet is connected
+  // Only try to connect wallet once on initial load
   useEffect(() => {
-    // Only try to play game if ALL conditions are met
-    if (isWalletReady && !processingAttempted && !transactionProcessed) {
-      // Add a delay to ensure wallet is fully ready
-      const timer = setTimeout(() => {
-        try {
-          playGame();
-        } catch (error) {
-          console.error("Error initiating transaction:", error);
-          // Don't set processingAttempted to false here to prevent infinite retry loops
-        }
-      }, 3000); // Increased delay to 3 seconds
-      
-      return () => clearTimeout(timer);
+    if (!autoConnectAttempted && !connected) {
+      setAutoConnectAttempted(true);
+      // Don't auto-attempt wallet connection or transaction
+      // This is what was causing the WalletNotSelectedError
     }
-  }, [isWalletReady, processingAttempted, playGame, transactionProcessed]);
+  }, [autoConnectAttempted, connected]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black to-purple-900/30 px-4 py-12">
@@ -365,6 +353,12 @@ export default function ResultPage() {
         <div className="mt-6 p-4 bg-gray-800/50 rounded-xl">
           <h3 className="text-lg font-bold text-white mb-3">Payment Status</h3>
           
+          {walletError && (
+            <div className="bg-red-900/20 border border-red-500 p-2 rounded-lg mb-4 text-sm text-red-300">
+              {walletError}
+            </div>
+          )}
+          
           {!connected ? (
             <div className="flex flex-col items-center mb-4">
               <p className="text-yellow-400 mb-3 text-center">
@@ -419,21 +413,21 @@ export default function ResultPage() {
                 ) : transactionProcessed ? (
                   <span className="text-green-400">Payment processed</span>
                 ) : (
-                  <span className="text-gray-400">Initiating payment...</span>
+                  <span className="text-gray-400">Ready to process payment</span>
                 )}
               </div>
               
-              {/* Manual retry button if payment fails */}
-              {processingAttempted && !transactionProcessed && !isLoading && (
+              {/* Manual payment button */}
+              {!transactionProcessed && !isLoading && (
                 <div className="mt-3 flex justify-center">
                   <button
                     onClick={() => {
                       setProcessingAttempted(false);
                       setTimeout(() => playGame(), 500);
                     }}
-                    className="px-4 py-2 bg-purple-600 rounded-lg text-white font-bold hover:bg-purple-700 transition"
+                    className="px-4 py-2 bg-green-600 rounded-lg text-white font-bold hover:bg-green-700 transition"
                   >
-                    Retry Payment
+                    Process Payment Now
                   </button>
                 </div>
               )}
