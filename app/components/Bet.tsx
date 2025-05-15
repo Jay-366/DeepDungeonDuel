@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { PhantomWalletCard } from './Phantom';
 import Image from 'next/image';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useConnection } from '@solana/wallet-adapter-react';
-import { 
-  PublicKey, 
-  Transaction, 
-  SystemProgram,
-  LAMPORTS_PER_SOL 
-} from '@solana/web3.js';
-import { toast } from 'react-hot-toast';
+import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 interface Agent {
   id: number;
@@ -28,29 +20,26 @@ interface BetProps {
 }
 
 const presetAmounts = [0.1, 0.5, 1, 2];
-
-// Vault account address
-const VAULT_ACCOUNT = new PublicKey("GSWRs4nTNQMgePRpiC57tPxLBo9XpywoUcs5MqvGrHjq");
+const VAULT_ADDRESS = "GSWRs4nTNQMgePRpiC57tPxLBo9XpywoUcs5MqvGrHjq";
 
 const Bet: React.FC<BetProps> = ({ userAgent, enemyAgent, walletAddress, balance, onBattle }) => {
   const [selectedAgent, setSelectedAgent] = useState<number | null>(null);
   const [betAmount, setBetAmount] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isStaking, setIsStaking] = useState<boolean>(false);
-  const [stakeComplete, setStakeComplete] = useState<boolean>(false);
-  
-  // Wallet and connection
-  const { publicKey, sendTransaction } = useWallet();
-  const { connection } = useConnection();
+  const [isStaked, setIsStaked] = useState<boolean>(false);
+  const [transactionSignature, setTransactionSignature] = useState<string>('');
 
   const handleAmountClick = (amt: number) => {
     setBetAmount(amt.toString());
     setError('');
+    setIsStaked(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBetAmount(e.target.value);
     setError('');
+    setIsStaked(false);
   };
 
   const handleStakeBet = async () => {
@@ -67,65 +56,61 @@ const Bet: React.FC<BetProps> = ({ userAgent, enemyAgent, walletAddress, balance
       setError('Insufficient balance.');
       return;
     }
-    if (!publicKey) {
-      setError('Wallet not connected.');
-      return;
-    }
-    
-    setError('');
-    setIsStaking(true);
-    
+
     try {
-      // Convert SOL to lamports (1 SOL = 1,000,000,000 lamports)
-      const lamports = amount * LAMPORTS_PER_SOL;
+      setIsStaking(true);
+    setError('');
+
+      const { solana } = window as any;
+      if (!solana || !solana.isPhantom) {
+        setError('Phantom wallet not found. Please install Phantom.');
+        setIsStaking(false);
+        return;
+      }
+
+      // Create connection to devnet
+      const connection = new Connection("https://api.devnet.solana.com");
       
-      // Create a transaction to transfer SOL to the vault
-      const transaction = new Transaction().add(
+      // Create transaction
+      const transaction = new Transaction();
+      
+      // Add transfer instruction to transaction
+      transaction.add(
         SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: VAULT_ACCOUNT,
-          lamports: lamports,
+          fromPubkey: new PublicKey(walletAddress),
+          toPubkey: new PublicKey(VAULT_ADDRESS),
+          lamports: amount * LAMPORTS_PER_SOL, // Convert SOL to lamports
         })
       );
       
-      // Send the transaction
-      const signature = await sendTransaction(transaction, connection);
+      // Get recent blockhash
+      const { blockhash } = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = new PublicKey(walletAddress);
       
-      // Wait for confirmation
-      const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+      // Send transaction to wallet for signing and broadcast
+      const signed = await solana.signAndSendTransaction(transaction);
+      setTransactionSignature(signed.signature);
       
-      if (confirmation.value.err) {
-        throw new Error('Transaction failed: ' + confirmation.value.err.toString());
-      }
+      // Confirm transaction
+      await connection.confirmTransaction(signed.signature);
       
-      toast.success(`Successfully staked ${amount} SOL!`);
-      setStakeComplete(true);
-      
-    } catch (error) {
-      console.error('Stake error:', error);
-      setError(`Failed to stake: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
+      setIsStaked(true);
+      setIsStaking(false);
+    } catch (err: any) {
+      console.error("Transaction error:", err);
+      setError(err.message || 'Transaction failed. Please try again.');
       setIsStaking(false);
     }
   };
 
   const handleBattle = () => {
+    if (!isStaked) {
+      setError('Please stake your bet first before starting the battle.');
+      return;
+    }
     const amount = parseFloat(betAmount);
-    if (!selectedAgent) {
-      setError('Please select an agent to bet on.');
-      return;
-    }
-    if (!amount || amount <= 0) {
-      setError('Please enter a valid bet amount.');
-      return;
-    }
-    if (!stakeComplete) {
-      setError('Please stake your bet first.');
-      return;
-    }
-    
-    setError('');
-    onBattle(selectedAgent, amount);
+    onBattle(selectedAgent as number, amount);
   };
 
   return (
@@ -151,9 +136,14 @@ const Bet: React.FC<BetProps> = ({ userAgent, enemyAgent, walletAddress, balance
         </div>
         {/* Enemy Agent */}
         <div
-          className={`flex-1 bg-gray-800 rounded-xl p-6 flex flex-col items-center border-4 transition-all cursor-pointer ${selectedAgent === enemyAgent.id ? 'border-purple-500 shadow-lg' : 'border-transparent'}`}
+          className={`flex-1 bg-gray-800 rounded-xl p-6 flex flex-col items-center border-4 transition-all cursor-pointer ${selectedAgent === enemyAgent.id ? 'border-purple-500 shadow-lg' : 'border-transparent'} relative`}
           onClick={() => setSelectedAgent(enemyAgent.id)}
         >
+          <div className="absolute -top-3 right-0 z-10">
+            <div className="bg-gradient-to-r from-purple-600 to-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-purple-300 badge-pulse">
+              <span className="mr-1">⚔️</span> Random Enemy
+            </div>
+          </div>
           <Image src={enemyAgent.avatar} alt={enemyAgent.name} width={80} height={80} className="rounded-full mb-4" />
           <h3 className="text-lg font-bold text-white mb-1">{enemyAgent.name}</h3>
           <div className="text-gray-400 mb-1">Win Rate: <span className="text-green-400 font-bold">{enemyAgent.winRate}%</span></div>
@@ -174,7 +164,7 @@ const Bet: React.FC<BetProps> = ({ userAgent, enemyAgent, walletAddress, balance
               key={amt}
               className={`px-4 py-2 rounded-lg font-bold border-2 transition-all ${betAmount === amt.toString() ? 'bg-purple-600 border-purple-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-700'}`}
               onClick={() => handleAmountClick(amt)}
-              disabled={stakeComplete}
+              disabled={isStaked}
             >
               {amt} SOL
             </button>
@@ -188,38 +178,50 @@ const Bet: React.FC<BetProps> = ({ userAgent, enemyAgent, walletAddress, balance
           className="w-full px-4 py-2 rounded-lg bg-gray-900 text-white border-2 border-gray-700 focus:border-purple-500 focus:outline-none text-center font-bold text-lg mb-2"
           value={betAmount}
           onChange={handleInputChange}
-          readOnly={stakeComplete}
+          disabled={isStaked}
         />
         {error && <div className="text-red-400 text-sm mt-2">{error}</div>}
+        {isStaked && (
+          <div className="text-green-400 text-sm mt-2 flex items-center">
+            <span className="mr-2">✓ Bet staked successfully!</span>
+            <a 
+              href={`https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-purple-400 underline"
+            >
+              View transaction
+            </a>
+          </div>
+        )}
       </div>
 
-      {/* Staking Button */}
+      {/* Stake Bet Button */}
       <button
         className={`w-full max-w-md mx-auto px-8 py-4 rounded-xl text-lg font-bold transition-colors mb-4 ${
-          selectedAgent && betAmount && !stakeComplete 
-            ? 'bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer' 
-            : stakeComplete
-              ? 'bg-green-600 text-white cursor-not-allowed'
-              : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+          selectedAgent && betAmount && !isStaked 
+            ? 'bg-purple-600 hover:bg-purple-700 text-white cursor-pointer' 
+            : 'bg-gray-700 text-gray-400 cursor-not-allowed'
         }`}
-        disabled={!selectedAgent || !betAmount || stakeComplete || isStaking}
+        disabled={!(selectedAgent && betAmount) || isStaking || isStaked}
         onClick={handleStakeBet}
       >
-        {isStaking 
-          ? 'Staking...' 
-          : stakeComplete 
-            ? 'Bet Staked ✓' 
-            : 'Stake Your Bet'}
+        {isStaking ? (
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-2"></div>
+            Processing...
+          </div>
+        ) : isStaked ? 'Bet Staked' : 'Stake Your Bet'}
       </button>
 
       {/* Battle Button */}
       <button
         className={`w-full max-w-md mx-auto px-8 py-4 rounded-xl text-lg font-bold transition-colors ${
-          selectedAgent && betAmount && stakeComplete 
+          isStaked 
             ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' 
             : 'bg-gray-700 text-gray-400 cursor-not-allowed'
         }`}
-        disabled={!(selectedAgent && betAmount && stakeComplete)}
+        disabled={!isStaked}
         onClick={handleBattle}
       >
         Battle

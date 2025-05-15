@@ -1,7 +1,5 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import { PhantomWalletCard } from '../components/Phantom';
 import Bet from '../components/Bet';
 import { useRouter } from 'next/navigation';
 import { Connection } from "@solana/web3.js";
