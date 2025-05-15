@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import BattleScene from '../scenes/BattleScene';
 import ChatInterface from './ChatInterface';
 import { useRouter } from 'next/navigation';

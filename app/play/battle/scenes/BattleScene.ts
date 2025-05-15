@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 
 export default class BattleScene extends Phaser.Scene {
   // Game entities
@@ -7,10 +7,29 @@ export default class BattleScene extends Phaser.Scene {
   private background: Phaser.GameObjects.Image | null = null;
   
   // UI elements
-  private playerHealthBar: any;
-  private enemyHealthBar: any;
+  private playerHealthBar: {
+    background: Phaser.GameObjects.Rectangle;
+    healthBar: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+  } | null = null;
+  private enemyHealthBar: {
+    background: Phaser.GameObjects.Rectangle;
+    healthBar: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+  } | null = null;
+  private playerEnergyBar: {
+    background: Phaser.GameObjects.Rectangle;
+    energyBar: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+  } | null = null;
+  private enemyEnergyBar: {
+    background: Phaser.GameObjects.Rectangle;
+    energyBar: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+  } | null = null;
   private actionButtons: Phaser.GameObjects.Container | null = null;
   private battleLog: Phaser.GameObjects.Text | null = null;
+  private autoAttackText: Phaser.GameObjects.Text | null = null;
   
   // Game state
   private currentTurn: 'player' | 'enemy' = 'player';
@@ -85,7 +104,7 @@ export default class BattleScene extends Phaser.Scene {
     // Update game logic here
     switch (this.battleState) {
       case 'playerTurn':
-        // Player turn logic
+        // Player turn logic - now handled by auto-attack
         break;
       case 'enemyTurn':
         // Enemy turn logic
@@ -98,7 +117,11 @@ export default class BattleScene extends Phaser.Scene {
     this.playerHealthBar = this.createHealthBar(120, 50, this.playerStats.health, this.playerStats.maxHealth);
     this.enemyHealthBar = this.createHealthBar(680, 50, this.enemyStats.health, this.enemyStats.maxHealth);
     
-    // Create action buttons
+    // Create energy bars
+    this.playerEnergyBar = this.createEnergyBar(120, 75, this.playerStats.energy, this.playerStats.maxEnergy);
+    this.enemyEnergyBar = this.createEnergyBar(680, 75, this.enemyStats.energy, this.enemyStats.maxEnergy);
+    
+    // Create action buttons (still created but will be hidden)
     this.actionButtons = this.add.container(400, 350);
     
     const attackButton = this.add.rectangle(0, 0, 120, 40, 0x7C3AED).setInteractive();
@@ -121,10 +144,15 @@ export default class BattleScene extends Phaser.Scene {
     
     this.actionButtons.add([attackButton, attackText, skillButton, skillText, defendButton, defendText]);
     
-    // Add event listeners to buttons
-    attackButton.on('pointerdown', () => this.onAttackAction());
-    skillButton.on('pointerdown', () => this.onSkillAction());
-    defendButton.on('pointerdown', () => this.onDefendAction());
+    // Auto-attack text notification
+    this.autoAttackText = this.add.text(400, 350, 'Auto-battling...', { 
+      color: '#ffffff',
+      fontSize: '16px',
+      fontStyle: 'italic',
+      backgroundColor: '#000000',
+      padding: { x: 10, y: 10 },
+      align: 'center',
+    }).setOrigin(0.5);
     
     // Add battle log
     this.battleLog = this.add.text(400, 140, '', { 
@@ -140,17 +168,23 @@ export default class BattleScene extends Phaser.Scene {
     const width = 120;
     const height = 20;
     
+    // Create the background container
     const background = this.add.rectangle(x, y, width, height, 0x000000);
     background.setStrokeStyle(2, 0xffffff);
     
+    // Create the health bar with origin at left side
     const healthBar = this.add.rectangle(
-      x - width / 2 + (width * health / maxHealth) / 2, 
+      x - width / 2, // Position at the left edge of the background
       y, 
       width * health / maxHealth, 
       height - 4, 
-      0xA855F7
+      0xEF4444
     );
     
+    // Set the origin to the left side of the health bar
+    healthBar.setOrigin(0, 0.5);
+    
+    // Add health text
     const text = this.add.text(x, y, `${health}/${maxHealth}`, { 
       color: '#ffffff', 
       fontSize: '12px' 
@@ -159,12 +193,57 @@ export default class BattleScene extends Phaser.Scene {
     return { background, healthBar, text };
   }
 
-  private updateHealthBar(healthBarObj: any, currentHealth: number, maxHealth: number) {
+  private updateHealthBar(healthBarObj: {
+    background: Phaser.GameObjects.Rectangle;
+    healthBar: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+  }, currentHealth: number, maxHealth: number) {
     const width = 120;
     
+    // Only update the width, not the position
     healthBarObj.healthBar.width = width * currentHealth / maxHealth;
-    healthBarObj.healthBar.x = healthBarObj.background.x - width / 2 + (width * currentHealth / maxHealth) / 2;
     healthBarObj.text.setText(`${currentHealth}/${maxHealth}`);
+  }
+
+  private createEnergyBar(x: number, y: number, energy: number, maxEnergy: number) {
+    const width = 120;
+    const height = 10;
+    
+    // Create the background container
+    const background = this.add.rectangle(x, y, width, height, 0x000000);
+    background.setStrokeStyle(2, 0xffffff);
+    
+    // Create the energy bar with origin at left side
+    const energyBar = this.add.rectangle(
+      x - width / 2, // Position at the left edge of the background
+      y, 
+      width * energy / maxEnergy, 
+      height - 4, 
+      0x3B82F6  // Blue color for energy
+    );
+    
+    // Set the origin to the left side of the energy bar
+    energyBar.setOrigin(0, 0.5);
+    
+    // Add energy text
+    const text = this.add.text(x, y, `EP:${energy}/${maxEnergy}`, { 
+      color: '#ffffff', 
+      fontSize: '10px' 
+    }).setOrigin(0.5);
+    
+    return { background, energyBar, text };
+  }
+
+  private updateEnergyBar(energyBarObj: {
+    background: Phaser.GameObjects.Rectangle;
+    energyBar: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+  }, currentEnergy: number, maxEnergy: number) {
+    const width = 120;
+    
+    // Update the width, not the position
+    energyBarObj.energyBar.width = width * currentEnergy / maxEnergy;
+    energyBarObj.text.setText(`EP:${currentEnergy}/${maxEnergy}`);
   }
 
   private startBattle() {
@@ -189,11 +268,54 @@ export default class BattleScene extends Phaser.Scene {
       this.showMessage('Your Turn!');
       
       if (typeof window !== 'undefined' && (window as any).addBattleMessage) {
-        (window as any).addBattleMessage('system', 'Your Turn! Choose an action.');
+        (window as any).addBattleMessage('system', 'Your Turn! Auto-selecting action...');
       }
       
-      this.actionButtons?.setVisible(true);
+      // Hide action buttons since we're auto-attacking
+      this.actionButtons?.setVisible(false);
+      
+      // Auto-select an action after a small delay
+      this.time.delayedCall(1000, () => this.autoSelectAction());
     });
+  }
+
+  private autoSelectAction() {
+    if (this.battleState !== 'playerTurn') return;
+    
+    // Randomly select an action, but avoid skill if not enough energy
+    let randomAction;
+    
+    if (this.playerStats.energy < 20) {
+      // Skip skill option if not enough energy
+      randomAction = Math.random() < 0.5 ? 1 : 3; // Either Attack or Defend
+    } else {
+      randomAction = Math.floor(Math.random() * 3) + 1; // 1: Attack, 2: Skill, 3: Defend
+    }
+    
+    // Display which action was selected
+    let actionName = '';
+    
+    switch (randomAction) {
+      case 1:
+        actionName = 'Attack';
+        this.onAttackAction();
+        break;
+      case 2:
+        actionName = 'Skill';
+        this.onSkillAction();
+        break;
+      case 3:
+        actionName = 'Defend';
+        this.onDefendAction();
+        break;
+    }
+    
+    // Update battle log to show selected action
+    this.showMessage(`Auto-selecting: ${actionName}`);
+    
+    if (typeof window !== 'undefined' && (window as any).addBattleMessage) {
+      (window as any).addBattleMessage('system', `Auto-selecting: ${actionName}`);
+    }
   }
 
   private onAttackAction() {
@@ -281,6 +403,7 @@ export default class BattleScene extends Phaser.Scene {
     
     // Update UI
     this.updateHealthBar(this.enemyHealthBar, this.enemyStats.health, this.enemyStats.maxHealth);
+    this.updateEnergyBar(this.playerEnergyBar, this.playerStats.energy, this.playerStats.maxEnergy);
     
     // Add damage message for enemy
     if (typeof window !== 'undefined' && (window as any).addBattleMessage) {
@@ -308,6 +431,9 @@ export default class BattleScene extends Phaser.Scene {
     
     // Restore some energy
     this.playerStats.energy = Math.min(this.playerStats.maxEnergy, this.playerStats.energy + 10);
+    
+    // Update energy bar
+    this.updateEnergyBar(this.playerEnergyBar, this.playerStats.energy, this.playerStats.maxEnergy);
     
     // Add to damage history
     this.damageHistory.push({
@@ -384,16 +510,17 @@ export default class BattleScene extends Phaser.Scene {
             return;
           }
           
-          // Back to player turn
+          // Back to player turn with auto-selection
           this.time.delayedCall(1500, () => {
             this.battleState = 'playerTurn';
             this.showMessage('Your Turn!');
             
             if (typeof window !== 'undefined' && (window as any).addBattleMessage) {
-              (window as any).addBattleMessage('system', 'Your Turn! Choose an action.');
+              (window as any).addBattleMessage('system', 'Your Turn! Auto-selecting action...');
             }
             
-            this.actionButtons?.setVisible(true);
+            // Auto-select an action after a small delay
+            this.time.delayedCall(1000, () => this.autoSelectAction());
           });
         }
       });
