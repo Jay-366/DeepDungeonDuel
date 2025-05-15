@@ -30,6 +30,7 @@ export default function ResultPage() {
   const [gameResult, setGameResult] = useState<null | {win: boolean; transaction: string}>(null);
   const [transactionProcessed, setTransactionProcessed] = useState(false);
   const [processingAttempted, setProcessingAttempted] = useState(false);
+  const [isWalletReady, setIsWalletReady] = useState(false);
 
   // Get data from query params
   const winner = params.get("winner") || "Unknown";
@@ -49,6 +50,15 @@ export default function ResultPage() {
   
   // Initialize betAmount with the appropriate value based on win/loss
   const [betAmount] = useState<string>(userBetWon ? payout : lossAmount);
+
+  // Check if wallet is ready
+  useEffect(() => {
+    if (connected && publicKey) {
+      setIsWalletReady(true);
+    } else {
+      setIsWalletReady(false);
+    }
+  }, [connected, publicKey]);
 
   // Parse damage history with fallback
   let damageHistory: any[] = [];
@@ -132,7 +142,9 @@ export default function ResultPage() {
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      toast.error("Failed to connect wallet");
+      // Don't display error toast here - it's distracting for users
+      // Instead, just inform user they need to connect
+      toast.error("Please connect your Phantom wallet to continue");
     }
   };
 
@@ -145,7 +157,9 @@ export default function ResultPage() {
     setProcessingAttempted(true);
     
     if (!publicKey || !connected) {
+      console.log("Wallet not connected or public key not available");
       setIsLoading(false);
+      setProcessingAttempted(false); // Reset so user can try again
       return;
     }
     
@@ -176,7 +190,7 @@ export default function ResultPage() {
       const configPDAResult = findConfigPDA();
       if (!configPDAResult) {
         throw new Error("Could not find config PDA");
-  }
+      }
 
       const [configPDA, __] = configPDAResult;
       
@@ -215,9 +229,23 @@ export default function ResultPage() {
        
     } catch (error) {
       console.error("Game error:", error);
-      toast.error(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      
+      // Check if it's a wallet-related error and provide appropriate message
+      let errorMessage = "Unknown error";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("Wallet not selected")) {
+          errorMessage = "Please connect your Phantom wallet";
+          setProcessingAttempted(false); // Allow retry
+        } else if (error.message.includes("User rejected")) {
+          errorMessage = "Transaction was rejected in your wallet";
+          setProcessingAttempted(false); // Allow retry
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -237,15 +265,21 @@ export default function ResultPage() {
   
   // Run once when component mounts and wallet is connected
   useEffect(() => {
-    if (connected && publicKey && !processingAttempted && !transactionProcessed) {
-      // Add a small delay to ensure the UI renders first
+    // Only try to play game if ALL conditions are met
+    if (isWalletReady && !processingAttempted && !transactionProcessed) {
+      // Add a delay to ensure wallet is fully ready
       const timer = setTimeout(() => {
-        playGame();
-      }, 2000);
+        try {
+          playGame();
+        } catch (error) {
+          console.error("Error initiating transaction:", error);
+          // Don't set processingAttempted to false here to prevent infinite retry loops
+        }
+      }, 3000); // Increased delay to 3 seconds
       
       return () => clearTimeout(timer);
     }
-  }, [connected, publicKey, processingAttempted, playGame, transactionProcessed]);
+  }, [isWalletReady, processingAttempted, playGame, transactionProcessed]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black to-purple-900/30 px-4 py-12">
@@ -332,7 +366,10 @@ export default function ResultPage() {
           <h3 className="text-lg font-bold text-white mb-3">Payment Status</h3>
           
           {!connected ? (
-            <div className="flex justify-center mb-4">
+            <div className="flex flex-col items-center mb-4">
+              <p className="text-yellow-400 mb-3 text-center">
+                Please connect your Phantom wallet to process the payment.
+              </p>
               <button 
                 onClick={handleConnectWallet}
                 className="flex items-center space-x-2 px-6 py-3 bg-purple-600 rounded-lg text-white font-bold hover:bg-purple-700 transition"
@@ -346,6 +383,9 @@ export default function ResultPage() {
                   className="ml-2"
                 />
               </button>
+              <p className="text-gray-400 mt-3 text-xs text-center">
+                If you don't have Phantom wallet installed, please install it from <a href="https://phantom.app/" target="_blank" rel="noopener noreferrer" className="text-purple-400 underline">phantom.app</a>
+              </p>
             </div>
           ) : (
             <>
