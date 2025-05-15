@@ -3,29 +3,19 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { Canvas } from '@react-three/fiber';
-import { PlayPhantomWalletCard } from '../components/Phantom';
 import { FaShieldAlt, FaUsers, FaTrophy } from 'react-icons/fa';
 import { Connection } from "@solana/web3.js";
-
-const Grog = dynamic(() => import('../../public/model/Grog_the_adventurer').then(mod => mod.Model), { ssr: false });
-const Batman = dynamic(() => import('../../public/model/Marvel_rivals_-_batman_beyond_fanart').then(mod => mod.Model), { ssr: false });
-const Repo = dynamic(() => import('../../public/model/O_realistic_character_free_download').then(mod => mod.Model), { ssr: false });
-const Knight = dynamic(() => import('../../public/model/The_forgotten_knight').then(mod => mod.Model), { ssr: false });
-
-const modelComponents = [Grog, Batman, Repo, Knight];
+import { PlayPhantomWalletCard } from '../components/Phantom';
 
 // Game character selection component
-const CharacterCard = ({ name, role, level, rarity, selected, onClick, ModelComponent, modelProps }: {
+const CharacterCard = ({ name, role, level, rarity, selected, onClick, imagePath }: {
   name: string;
   role: string;
   level: number;
   rarity: string;
   selected: boolean;
   onClick: () => void;
-  ModelComponent: React.ComponentType<any>;
-  modelProps: any;
+  imagePath: string;
 }) => {
   return (
     <div
@@ -36,11 +26,17 @@ const CharacterCard = ({ name, role, level, rarity, selected, onClick, ModelComp
         {rarity}
       </div>
       <div className="p-6">
-        <div style={{ width: '100%', height: 192 }}>
-          <Canvas camera={{ position: [0, 0, 2.5] }}>
-            <ambientLight />
-            <ModelComponent {...modelProps} />
-          </Canvas>
+        <div style={{ width: '100%', height: 192 }} className="flex items-center justify-center">
+          <div className="relative w-40 h-40 mb-2">
+            <Image 
+              src={imagePath}
+              alt={name} 
+              fill
+              style={{ objectFit: 'contain' }}
+              priority
+              className="pixel-art"
+            />
+          </div>
         </div>
         <h3 className="text-xl font-bold text-white mb-1 fantasy-title">{name}</h3>
         <p className="text-purple-300 mb-3 fantasy-title">{role}</p>
@@ -130,7 +126,7 @@ export default function Play() {
   const router = useRouter();
   const { walletAddress, connect, connecting, balance } = usePhantomWallet();
 
-  // Placeholder characters
+  // Placeholder characters with static images
   const characters = [
     {
       id: 1,
@@ -138,35 +134,31 @@ export default function Play() {
       role: "Warrior",
       level: 1,
       rarity: "Common",
-      ModelComponent: Grog,
-      modelProps: { scale: 6, position: [0, -1.1, 0] }
+      imagePath: "/character/suitcaseman.png"
     },
     {
       id: 2,
-      name: "Lyra",
+      name: "Blue Witch",
       role: "Mage",
       level: 1,
-      rarity: "Common",
-      ModelComponent: Batman,
-      modelProps: { scale: 1.5, position: [0, -1.3, 0] }
+      rarity: "Rare",
+      imagePath: "/character/bluewitch.png"
     },
     {
       id: 3,
       name: "Thorne",
       role: "Rogue",
       level: 1,
-      rarity: "Common",
-      ModelComponent: Repo,
-      modelProps: { scale: 2, position: [0, -1.3, 0] }
+      rarity: "Epic",
+      imagePath: "/character/armouredwarrior.png"
     },
     {
       id: 4,
       name: "Aeliana",
       role: "Healer",
       level: 1,
-      rarity: "Common",
-      ModelComponent: Knight,
-      modelProps: { scale: 1.1, position: [0, -1.1, 0] }
+      rarity: "Legendary",
+      imagePath: "/character/dragonwarrior.png"
     },
   ];
 
@@ -234,8 +226,7 @@ export default function Play() {
                 rarity={character.rarity}
                 selected={selectedChampion === character.id}
                 onClick={() => setSelectedChampion(selectedChampion === character.id ? null : character.id)}
-                ModelComponent={character.ModelComponent}
-                modelProps={character.modelProps}
+                imagePath={character.imagePath}
               />
             ))}
           </div>

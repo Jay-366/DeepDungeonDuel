@@ -31,7 +31,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ClientWalletProvider>
-          {children}
+        {children}
         </ClientWalletProvider>
       </body>
     </html>

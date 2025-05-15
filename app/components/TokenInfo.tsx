@@ -7,7 +7,7 @@ const TokenInfo = () => {
         <div className="max-w-3xl mx-auto mb-16 text-center">
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Game Token Economy</h2>
           <p className="text-xl text-gray-300">
-            The $DDT token powers all aspects of the DeepDungeonDuel ecosystem
+            The SOL token powers all aspects of the DeepDungeonDuel ecosystem
           </p>
         </div>
         
@@ -18,7 +18,7 @@ const TokenInfo = () => {
             </div>
             <h3 className="mb-2 text-xl font-bold text-white">In-Game Currency</h3>
             <p className="text-gray-400">
-              Use $DDT tokens to purchase heroes, equipment, and items within the game marketplace.
+              Use SOL tokens to purchase heroes, equipment, and items within the game marketplace.
             </p>
           </div>
           
@@ -28,7 +28,7 @@ const TokenInfo = () => {
             </div>
             <h3 className="mb-2 text-xl font-bold text-white">Staking Rewards</h3>
             <p className="text-gray-400">
-              Stake your $DDT tokens to earn passive income and exclusive in-game benefits.
+              Stake your SOL tokens to earn passive income and exclusive in-game benefits.
             </p>
           </div>
           
@@ -48,7 +48,7 @@ const TokenInfo = () => {
             </div>
             <h3 className="mb-2 text-xl font-bold text-white">Play-to-Earn</h3>
             <p className="text-gray-400">
-              Complete quests, win battles, and participate in tournaments to earn $DDT tokens.
+              Complete quests, win battles, and participate in tournaments to earn SOL tokens.
             </p>
           </div>
         </div>

@@ -44,8 +44,11 @@ export default function ResultPage() {
   // Calculate payout
   const payout = (Number(bet) * odds).toFixed(3); // Format payout to 3 decimal places
   
-  // Initialize betAmount with the payout value
-  const [betAmount] = useState<string>(userBetWon ? payout : bet);
+  // Calculate loss amount (5% of bet amount if user lost)
+  const lossAmount = (Number(bet) * 0.05).toFixed(3);
+  
+  // Initialize betAmount with the appropriate value based on win/loss
+  const [betAmount] = useState<string>(userBetWon ? payout : lossAmount);
 
   // Parse damage history with fallback
   let damageHistory: any[] = [];
@@ -92,7 +95,7 @@ export default function ResultPage() {
     const provider = getProvider();
     if (!provider) return null;
     
-    // @ts-ignore - the IDL is properly formatted but TypeScript doesn't know
+    // @ts-expect-error - the IDL is properly formatted but TypeScript doesn't know
     return new Program(idl, PROGRAM_ID, provider);
   }, [getProvider]);
 
@@ -173,8 +176,8 @@ export default function ResultPage() {
       const configPDAResult = findConfigPDA();
       if (!configPDAResult) {
         throw new Error("Could not find config PDA");
-      }
-      
+  }
+
       const [configPDA, __] = configPDAResult;
       
       // Prepare the transaction
@@ -205,7 +208,7 @@ export default function ResultPage() {
       toast.success(
         userBetWon 
           ? `You won ${amountInSol} SOL!` 
-          : `You lost ${amountInSol} SOL. Better luck next time!`
+          : `You lost the bet. You pay only ${amountInSol} SOL (5% of your bet).`
       );
       
       setTransactionProcessed(true);
@@ -251,9 +254,9 @@ export default function ResultPage() {
         
         {/* Show bet win/loss status */}
         <div className={`text-center mb-6 font-bold text-xl ${userBetWon ? 'text-green-400' : 'text-red-400'}`}>
-          {userBetWon 
-            ? `You bet on ${betAgentName} and won!` 
-            : `You bet on ${betAgentName} and lost.`}
+          {userBetWon
+            ? "Congratulations, You Won!"
+            : "You Lost, But Pay Only 5%"}
         </div>
         
         <div className="flex justify-between items-center mb-6">
@@ -319,7 +322,7 @@ export default function ResultPage() {
           <div>
             <div className="text-gray-400">Payout</div>
             <div className={userBetWon ? "text-green-400 font-bold" : "text-red-400 font-bold"}>
-              {userBetWon ? `+${payout}` : `-${bet}`} SOL
+              {userBetWon ? `+${payout}` : `-${lossAmount}`} SOL
             </div>
           </div>
         </div>
@@ -421,7 +424,7 @@ export default function ResultPage() {
         <div className="text-center text-gray-400 mt-6">
           {userBetWon 
             ? `Congratulations! You've earned ${payout} SOL.`
-            : `Unfortunately, you've lost ${bet} SOL.`}
+            : `You lost the bet. Please pay ${lossAmount} SOL (5% of your bet).`}
         </div>
         <button
           className="mt-8 px-8 py-3 rounded-xl bg-purple-600 text-white font-bold hover:bg-purple-700 transition"
