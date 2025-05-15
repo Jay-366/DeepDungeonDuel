@@ -217,7 +217,7 @@ export default function Play() {
         </div>
 
         {/* Wallet Connection */}
-        <PlayPhantomWalletCard walletAddress={walletAddress} winRate={72.5} amount={"1.23"} />
+        <PlayPhantomWalletCard walletAddress={walletAddress} winRate={72.5} balance={balance ? balance.replace(' SOL', '') : null} />
 
         {/* Character Selection */}
         <div className="mb-12">
