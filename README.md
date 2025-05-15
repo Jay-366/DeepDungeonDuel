@@ -1,6 +1,6 @@
 # DeepDungeonDuel
 
-An immersive fantasy battle game built on Next.js with Solana blockchain integration for betting and rewards.
+An immersive fantasy battle game built on Next.js with Solana blockchain integration for betting and rewards. Link to the project:
 
 ## Overview
 
@@ -54,7 +54,7 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Game Instructions
 
@@ -70,19 +70,3 @@ The game interacts with a Solana smart contract for handling bets and rewards:
 
 - Contract Address: `AP62gFAAsUSdKqCxhgkzyqGxwbP5Hhs4SBSUb4ARtXyz`
 - Vault Address: `GSWRs4nTNQMgePRpiC57tPxLBo9XpywoUcs5MqvGrHjq`
-
-## Deployment
-
-The easiest way to deploy is using Vercel:
-
-1. Push your code to a Git repository
-2. Connect your repository to [Vercel](https://vercel.com)
-3. Vercel will automatically detect Next.js and deploy your application
-
-## Environment Variables
-
-No additional environment variables are required for basic operation.
-
-## License
-
-This project is licensed under the MIT License.
