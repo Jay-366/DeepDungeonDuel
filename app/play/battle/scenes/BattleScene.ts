@@ -31,28 +31,20 @@ export default class BattleScene extends Phaser.Scene {
     energy: 80,
     maxEnergy: 80
   };
-  
-  // Battle data from URL params
-  private betAmount: number = 0;
-  private odds: number = 1;
-  private playerName: string = 'Eldric';
-  private enemyName: string = 'Blue Witch';
-  private damageHistory: any[] = [];
+
+  // Bet information
+  private betAmount: string = '0';
+  private damageHistory: any[] = [
+    // Initial sample data in case nothing gets recorded
+    { agent: 'Eldric', action: 'Start Battle', amount: 0 },
+    { agent: 'Blue Witch', action: 'Prepare', amount: 0 }
+  ];
 
   constructor() {
     super('BattleScene');
   }
 
   preload() {
-    // Get URL parameters
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      this.betAmount = Number(urlParams.get('bet')) || 0;
-      this.odds = Number(urlParams.get('odds')) || 1;
-      this.playerName = urlParams.get('player') || 'Eldric';
-      this.enemyName = urlParams.get('opponent') || 'Blue Witch';
-    }
-    
     // Load game assets
     this.load.image('bg-palace-hallway', '/background/vecteezy_royal-palace-hallway-with-stairs-at-night_24238333.jpg');
     this.load.image('bg-palace-corridor', '/background/vecteezy_ancient-palace-or-castle-corridor-interior_23878092.jpg');
@@ -179,6 +171,13 @@ export default class BattleScene extends Phaser.Scene {
     this.battleState = 'start';
     this.showMessage('Battle Start!');
     
+    // Add to damage history
+    this.damageHistory.push({
+      agent: 'System',
+      action: 'Battle Started',
+      amount: 0
+    });
+    
     // Add initial message to chat interface
     if (typeof window !== 'undefined' && (window as any).addBattleMessage) {
       (window as any).addBattleMessage('system', 'Battle Start! Prepare for combat.');
@@ -209,9 +208,9 @@ export default class BattleScene extends Phaser.Scene {
     // Update enemy health
     this.enemyStats.health = Math.max(0, this.enemyStats.health - damage);
     
-    // Record for battle history
+    // Add to damage history
     this.damageHistory.push({
-      agent: this.playerName,
+      agent: 'Eldric',
       action: 'Attack',
       amount: damage
     });
@@ -265,10 +264,10 @@ export default class BattleScene extends Phaser.Scene {
     this.playerStats.energy = Math.max(0, this.playerStats.energy - 20);
     this.enemyStats.health = Math.max(0, this.enemyStats.health - damage);
     
-    // Record for battle history
+    // Add to damage history
     this.damageHistory.push({
-      agent: this.playerName,
-      action: 'Skill',
+      agent: 'Eldric',
+      action: 'Skill Attack',
       amount: Math.floor(damage)
     });
     
@@ -310,9 +309,9 @@ export default class BattleScene extends Phaser.Scene {
     // Restore some energy
     this.playerStats.energy = Math.min(this.playerStats.maxEnergy, this.playerStats.energy + 10);
     
-    // Record for battle history
+    // Add to damage history
     this.damageHistory.push({
-      agent: this.playerName,
+      agent: 'Eldric',
       action: 'Defend',
       amount: 0
     });
@@ -345,9 +344,9 @@ export default class BattleScene extends Phaser.Scene {
       // Update player health
       this.playerStats.health = Math.max(0, this.playerStats.health - damage);
       
-      // Record for battle history
+      // Add to damage history
       this.damageHistory.push({
-        agent: this.enemyName,
+        agent: 'Blue Witch',
         action: 'Attack',
         amount: damage
       });
@@ -406,34 +405,24 @@ export default class BattleScene extends Phaser.Scene {
     this.showMessage('Victory!');
     
     if (typeof window !== 'undefined' && (window as any).addBattleMessage) {
-      (window as any).addBattleMessage('system', 'Victory! You defeated the enemy.', 'victory');
+      (window as any).addBattleMessage('system', 'Victory! You have won the battle.');
     }
     
-    // Show victory screen
-    const victoryText = this.add.text(400, 200, 'You Won!', { 
-      color: '#FFDD00', 
-      fontSize: '32px',
-      stroke: '#000000',
-      strokeThickness: 6
-    }).setOrigin(0.5);
+    // Get bet agent name
+    const betAgentName = typeof window !== 'undefined' ? 
+      localStorage.getItem('betAgentName') || '' : '';
     
-    const continueButton = this.add.rectangle(400, 260, 160, 50, 0x7C3AED).setInteractive();
-    const continueText = this.add.text(400, 260, 'Continue', { 
-      color: '#ffffff', 
-      fontSize: '18px' 
-    }).setOrigin(0.5);
-    
-    continueButton.on('pointerdown', () => {
-      // Navigate to result page with real battle data
-      const resultData = {
-        winner: this.playerName,
-        loser: this.enemyName,
-        bet: this.betAmount,
-        odds: this.odds,
-        history: this.damageHistory,
-      };
+    // Wait 3 seconds then show result
+    this.time.delayedCall(3000, () => {
       if (typeof window !== 'undefined' && (window as any).goToBattleResult) {
-        (window as any).goToBattleResult(resultData);
+        (window as any).goToBattleResult({
+          winner: 'Eldric',
+          loser: 'Blue Witch',
+          bet: this.betAmount,
+          odds: 1.5,
+          history: this.damageHistory,
+          betAgentName
+        });
       }
     });
   }
@@ -443,26 +432,25 @@ export default class BattleScene extends Phaser.Scene {
     this.showMessage('Defeat!');
     
     if (typeof window !== 'undefined' && (window as any).addBattleMessage) {
-      (window as any).addBattleMessage('system', 'Defeat! You were defeated by the enemy.', 'defeat');
+      (window as any).addBattleMessage('system', 'Defeat! You have lost the battle.');
     }
     
-    // Show defeat screen
-    const defeatText = this.add.text(400, 200, 'You Lost!', { 
-      color: '#FF0000', 
-      fontSize: '32px',
-      stroke: '#000000',
-      strokeThickness: 6
-    }).setOrigin(0.5);
+    // Get bet agent name
+    const betAgentName = typeof window !== 'undefined' ? 
+      localStorage.getItem('betAgentName') || '' : '';
     
-    const retryButton = this.add.rectangle(400, 260, 160, 50, 0x7C3AED).setInteractive();
-    const retryText = this.add.text(400, 260, 'Try Again', { 
-      color: '#ffffff', 
-      fontSize: '18px' 
-    }).setOrigin(0.5);
-    
-    retryButton.on('pointerdown', () => {
-      // Restart the battle
-      this.scene.restart();
+    // Wait 3 seconds then show result
+    this.time.delayedCall(3000, () => {
+      if (typeof window !== 'undefined' && (window as any).goToBattleResult) {
+        (window as any).goToBattleResult({
+          winner: 'Blue Witch',
+          loser: 'Eldric',
+          bet: this.betAmount,
+          odds: 1.5,
+          history: this.damageHistory,
+          betAgentName
+        });
+      }
     });
   }
 
@@ -471,5 +459,15 @@ export default class BattleScene extends Phaser.Scene {
     if (this.battleLog) {
       this.battleLog.setText(message);
     }
+  }
+
+  // Method to set bet amount from outside
+  setBetAmount(amount: string) {
+    this.betAmount = amount;
+  }
+
+  // Method to get damage history
+  getDamageHistory() {
+    return this.damageHistory;
   }
 }
