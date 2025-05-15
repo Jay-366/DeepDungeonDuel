@@ -22,7 +22,7 @@ export default function ResultPage() {
   const router = useRouter();
 
   // Wallet and connection
-  const { publicKey, sendTransaction, connected, signTransaction, connect } = useWallet();
+  const { publicKey, sendTransaction, connected, signTransaction, connect, wallet } = useWallet();
   const { connection } = useConnection();
   
   // State management
@@ -31,7 +31,6 @@ export default function ResultPage() {
   const [transactionProcessed, setTransactionProcessed] = useState(false);
   const [processingAttempted, setProcessingAttempted] = useState(false);
   const [walletError, setWalletError] = useState<string | null>(null);
-  const [autoConnectAttempted, setAutoConnectAttempted] = useState(false);
 
   // Get data from query params
   const winner = params.get("winner") || "Unknown";
@@ -74,109 +73,141 @@ export default function ResultPage() {
     ];
   }
 
-  // Get provider
+  // Get provider - ONLY call when wallet is properly connected
   const getProvider = useCallback(() => {
-    if (!publicKey || !signTransaction) {
+    if (!publicKey || !signTransaction || !connected || !wallet) {
+      console.log("Wallet not ready for provider creation");
       return null;
     }
     
-    const provider = new AnchorProvider(
-      connection,
-      {
-        publicKey,
-        signTransaction,
-        signAllTransactions: () => Promise.resolve([]),
-      },
-      { commitment: 'processed' }
-    );
-    
-    return provider;
-  }, [publicKey, signTransaction, connection]);
+    try {
+      const provider = new AnchorProvider(
+        connection,
+        {
+          publicKey,
+          signTransaction,
+          signAllTransactions: () => Promise.resolve([]),
+        },
+        { commitment: 'processed' }
+      );
+      
+      return provider;
+    } catch (error) {
+      console.error("Error creating provider:", error);
+      return null;
+    }
+  }, [publicKey, signTransaction, connection, connected, wallet]);
 
   const getProgram = useCallback(() => {
     const provider = getProvider();
-    if (!provider) return null;
+    if (!provider) {
+      console.log("No provider available for program creation");
+      return null;
+    }
     
-    // @ts-expect-error - the IDL is properly formatted but TypeScript doesn't know
-    return new Program(idl, PROGRAM_ID, provider);
+    try {
+      // @ts-expect-error - the IDL is properly formatted but TypeScript doesn't know
+      return new Program(idl, PROGRAM_ID, provider);
+    } catch (error) {
+      console.error("Error creating program:", error);
+      return null;
+    }
   }, [getProvider]);
 
   // Find the vault PDA
   const findVaultPDA = useCallback(() => {
-    if (!publicKey) return null;
+    if (!publicKey) {
+      console.log("No public key available for vault PDA");
+      return null;
+    }
     
-    return PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("vault"), 
-        publicKey.toBuffer()
-      ],
-      PROGRAM_ID
-    );
+    try {
+      return PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("vault"), 
+          publicKey.toBuffer()
+        ],
+        PROGRAM_ID
+      );
+    } catch (error) {
+      console.error("Error finding vault PDA:", error);
+      return null;
+    }
   }, [publicKey]);
 
   // Find the config PDA
   const findConfigPDA = useCallback(() => {
-    if (!publicKey) return null;
-    
-    return PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("config")
-      ],
-      PROGRAM_ID
-    );
-  }, [publicKey]);
+    try {
+      return PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("config")
+        ],
+        PROGRAM_ID
+      );
+    } catch (error) {
+      console.error("Error finding config PDA:", error);
+      return null;
+    }
+  }, []);
 
   const handleConnectWallet = async () => {
+    if (!connect) {
+      setWalletError("Wallet adapter not available. Please refresh the page.");
+      return;
+    }
+
     try {
       setWalletError(null);
-      if (connect) {
-        await connect();
-        toast.success("Wallet connected!");
-      }
+      await connect();
+      toast.success("Wallet connected!");
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      setWalletError("Failed to connect wallet. Please try again.");
-      toast.error("Please connect your wallet manually");
+      let errorMessage = "Failed to connect wallet";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("Wallet not selected")) {
+          errorMessage = "Please select a wallet in the Phantom extension";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setWalletError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
   const playGame = useCallback(async () => {
+    // Safety check to prevent issues when wallet is not available
+    if (!wallet || !publicKey || !connected || !sendTransaction) {
+      setWalletError("Wallet not fully connected. Please connect your wallet first.");
+      toast.error("Please ensure your wallet is connected");
+      return;
+    }
+    
     // Prevent multiple processing attempts
     if (processingAttempted) {
       return;
     }
     
     setProcessingAttempted(true);
+    setIsLoading(true);
+    setWalletError(null);
     
-    if (!publicKey || !connected) {
-      console.log("Wallet not connected or public key not available");
-      setIsLoading(false);
-      setProcessingAttempted(false);
-      setWalletError("Please connect your wallet to continue");
-      return;
-    }
-    
-    if (transactionProcessed) {
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      setIsLoading(true);
-      setWalletError(null);
-      
       const amountInSol = parseFloat(betAmount);
       // Convert SOL to lamports (1 SOL = 1,000,000,000 lamports)
       const amountInLamports = new BN(amountInSol * LAMPORTS_PER_SOL);
       
+      // Explicitly check for program and PDAs before attempting transaction
       const program = getProgram();
       if (!program) {
-        throw new Error("Could not initialize program");
+        throw new Error("Could not initialize program. Please try connecting your wallet again.");
       }
       
       const vaultPDAResult = findVaultPDA();
       if (!vaultPDAResult) {
-        throw new Error("Could not find vault PDA");
+        throw new Error("Could not find vault PDA. Please try connecting your wallet again.");
       }
       
       const [vaultPDA, _] = vaultPDAResult;
@@ -191,22 +222,46 @@ export default function ResultPage() {
       // Prepare the transaction
       const tx = new Transaction();
       
-      const ix = await program.methods
-        .playGame(userBetWon, amountInLamports)
-        .accounts({
-          vault: vaultPDA,
-          user: publicKey,
-          authority: publicKey,
-          config: configPDA,
-          systemProgram: SystemProgram.programId,
-        })
-        .instruction();
-         
-      tx.add(ix);
-         
-      // Send the transaction
-      const signature = await sendTransaction(tx, connection);
-      await connection.confirmTransaction(signature, 'processed');
+      try {
+        const ix = await program.methods
+          .playGame(userBetWon, amountInLamports)
+          .accounts({
+            vault: vaultPDA,
+            user: publicKey,
+            authority: publicKey,
+            config: configPDA,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction();
+           
+        tx.add(ix);
+      } catch (instError) {
+        console.error("Error creating instruction:", instError);
+        throw new Error("Failed to create transaction instruction. Please try again.");
+      }
+      
+      // Send the transaction with explicit error handling
+      let signature;
+      try {
+        signature = await sendTransaction(tx, connection);
+      } catch (txError) {
+        console.error("Transaction send error:", txError);
+        if (txError instanceof Error) {
+          if (txError.message.includes("User rejected")) {
+            throw new Error("Transaction was rejected in your wallet");
+          } else {
+            throw txError;
+          }
+        }
+        throw new Error("Failed to send transaction");
+      }
+      
+      try {
+        await connection.confirmTransaction(signature, 'processed');
+      } catch (confirmError) {
+        console.error("Transaction confirmation error:", confirmError);
+        throw new Error("Transaction sent but confirmation failed. Please check Solana Explorer.");
+      }
       
       setGameResult({ 
         win: userBetWon, 
@@ -232,10 +287,8 @@ export default function ResultPage() {
         if (error.message.includes("Wallet not selected") || 
             error.message.includes("WalletNotSelected")) {
           errorMessage = "Please connect your wallet first";
-          setProcessingAttempted(false);
         } else if (error.message.includes("User rejected")) {
           errorMessage = "Transaction was rejected in your wallet";
-          setProcessingAttempted(false);
         } else {
           errorMessage = error.message;
         }
@@ -245,6 +298,7 @@ export default function ResultPage() {
       toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
+      setProcessingAttempted(false); // Always reset so user can retry
     }
   }, [
     betAmount, 
@@ -253,21 +307,11 @@ export default function ResultPage() {
     findConfigPDA, 
     findVaultPDA, 
     getProgram, 
-    processingAttempted, 
     publicKey, 
     sendTransaction, 
-    transactionProcessed, 
-    userBetWon
+    userBetWon,
+    wallet
   ]);
-  
-  // Only try to connect wallet once on initial load
-  useEffect(() => {
-    if (!autoConnectAttempted && !connected) {
-      setAutoConnectAttempted(true);
-      // Don't auto-attempt wallet connection or transaction
-      // This is what was causing the WalletNotSelectedError
-    }
-  }, [autoConnectAttempted, connected]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black to-purple-900/30 px-4 py-12">
@@ -421,10 +465,7 @@ export default function ResultPage() {
               {!transactionProcessed && !isLoading && (
                 <div className="mt-3 flex justify-center">
                   <button
-                    onClick={() => {
-                      setProcessingAttempted(false);
-                      setTimeout(() => playGame(), 500);
-                    }}
+                    onClick={playGame}
                     className="px-4 py-2 bg-green-600 rounded-lg text-white font-bold hover:bg-green-700 transition"
                   >
                     Process Payment Now
