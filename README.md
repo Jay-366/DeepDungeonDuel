@@ -1,6 +1,6 @@
 # DeepDungeonDuel
 
-An immersive fantasy battle game built on Next.js with Solana blockchain integration for betting and rewards. Link to the project:https://deep-dungeon-duel.vercel.app
+An immersive fantasy battle game built on Next.js with Solana blockchain integration for staking and rewards. Link to the project:https://deep-dungeon-duel.vercel.app
 
 ## Overview
 
